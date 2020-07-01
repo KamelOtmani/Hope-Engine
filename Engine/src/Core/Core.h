@@ -7,5 +7,7 @@
         #define HOPE_API __declspec(dllimport)
     #endif
 #else
-    #error Hazel only supports Windows!
+    #error HEngine only supports Windows!
 #endif
+
+#define BIT(x) (1 << x) 

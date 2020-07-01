@@ -350,3 +350,11 @@ healthchecksdb
 
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
+
+*.tlog
+
+bin-int/Debug-x86_64/Sandbox/vc142.idb
+
+*.idb
+
+bin-int/Debug-x86_64/Engine/Engine.vcxproj.FileListAbsolute.txt

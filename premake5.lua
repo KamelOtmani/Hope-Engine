@@ -7,7 +7,7 @@ workspace "Hope Engine"
 		"Release"
 	}
 
-outputdir = "%{cfg.buildcfg}-%{cfg.system}"
+outputdir = "%{cfg.buildcfg}-%{cfg.architecture}"
 
 project "Engine"
 	location "Engine"
@@ -17,6 +17,9 @@ project "Engine"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+	pchheader "PCH/hpch.h"
+	pchsource "PCH/hpch.cpp"
+
 	files
 	{
 		"%{prj.name}/src/**.h",
@@ -25,7 +28,9 @@ project "Engine"
 
 	includedirs
 	{
-		"%{prj.name}/vendor/spdlog/include"
+		"%{prj.name}/vendor/spdlog/include",
+		"%{prj.name}/src/",
+		"%{prj.name}/src/PCH"
 	}
 
 	filter "system:windows"
@@ -81,7 +86,7 @@ project "Sandbox"
 	filter "system:windows"
 		cppdialect "C++17"
 		staticruntime "On"
-		systemversion "10.0.17134.0"
+		systemversion "latest"
 
 		defines
 		{

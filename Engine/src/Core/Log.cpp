@@ -1,3 +1,4 @@
+#include "PCH/hpch.h"
 #include "Log.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
@@ -14,5 +15,6 @@ namespace HEngine {
 
         s_ClientLogger = spdlog::stdout_color_mt("CLIENT");
         s_ClientLogger->set_level(spdlog::level::trace);
+
     }
 }

@@ -5,6 +5,8 @@
 #include "Core/Core.h"
 #include "Core/Application.h"
 #include "Core/Log.h"
+
+#include "Events/Event.h"
 //----------------------------------------
 // STD Library
 //----------------------------------------
