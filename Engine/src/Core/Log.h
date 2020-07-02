@@ -27,11 +27,13 @@ enum LOG_LEVEL
 };
 
 // Engine Log
-#define HEngineLOG(...)     ::HEngine::Log::GetEngineLogger()->info(__VA_ARGS__)
+#define HEngineINFO(...)     ::HEngine::Log::GetEngineLogger()->info(__VA_ARGS__)
+#define HEngineLOG(...)     ::HEngine::Log::GetEngineLogger()->trace(__VA_ARGS__)
 #define HEngineWARN(...)    ::HEngine::Log::GetEngineLogger()->warn(__VA_ARGS__)
 #define HEngineERROR(...)   ::HEngine::Log::GetEngineLogger()->error(__VA_ARGS__)
 
 // Client Log
-#define HLOG(...)   ::HEngine::Log::GetClientLogger()->info(__VA_ARGS__)
+#define HINFO(...)   ::HEngine::Log::GetClientLogger()->info(__VA_ARGS__)
+#define HLOG(...)   ::HEngine::Log::GetClientLogger()->trace(__VA_ARGS__)
 #define HWARN(...)  ::HEngine::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define HERROR(...) ::HEngine::Log::GetClientLogger()->error(__VA_ARGS__)

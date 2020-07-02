@@ -11,6 +11,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.architecture}"
 
 IncludeDir = {}
 IncludeDir["GLFW"] = "Engine/vendor/GLFW/include"
+IncludeDir["Glad"] = "Engine/vendor/Glad/include"
 
 project "Engine"
 	location "Engine"
@@ -35,12 +36,14 @@ project "Engine"
 		"%{prj.name}/src/",
 		"%{prj.name}/src/PCH",	
 		"%{prj.name}/vendor/spdlog/include",
-		"%{IncludeDir.GLFW}"
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}"
 	}
 
 	links 
 	{ 
 		"GLFW",
+		"Glad",
 		"opengl32.lib"
 	}
 
@@ -52,7 +55,8 @@ project "Engine"
 		defines
 		{
 			"HOPE_PLATFORM_WINDOWS",
-			"HOPE_BUILD_DLL"
+			"HOPE_BUILD_DLL",
+			"GLFW_INCLUDE_NONE"
 		}
 
 		postbuildcommands
@@ -62,10 +66,12 @@ project "Engine"
 
 	filter "configurations:Debug"
 		defines "HOPE_DEBUG"
+		buildoptions "/MDd"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "HOPE_RELEASE"
+		buildoptions "/MD"
 		optimize "On"
 
 	
@@ -106,10 +112,12 @@ project "Sandbox"
 
     filter "configurations:Debug"
 		defines "HOPE_DEBUG"
+		buildoptions "/MDd"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "HOPE_RELEASE"
+		buildoptions "/MD"
 		optimize "On"
 
 project "GLFW"
@@ -187,3 +195,29 @@ project "GLFW"
 	filter "configurations:Release"
 		runtime "Release"
 		optimize "on"
+
+project "Glad"
+    kind "StaticLib"
+    language "C"
+
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+    files
+    {
+        "Engine/vendor/Glad/include/glad/glad.h",
+        "Engine/vendor/Glad/include/KHR/khrplatform.h",
+        "Engine/vendor/Glad/src/glad.c"
+    }
+
+	includedirs
+	{
+		"Engine/vendor/Glad/include"
+	}
+
+    filter "system:windows"
+        systemversion "latest"
+        staticruntime "On"
+
+    filter { "system:windows", "configurations:Release" }
+        buildoptions "/MT" 

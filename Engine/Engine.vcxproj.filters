@@ -7,8 +7,14 @@
     <Filter Include="Events">
       <UniqueIdentifier>{3A8963B1-262B-8E87-0FE6-A1DBFB2615D8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Layers">
+      <UniqueIdentifier>{157446C0-0116-7196-EAD0-84EAD611F8E6}</UniqueIdentifier>
+    </Filter>
     <Filter Include="PCH">
       <UniqueIdentifier>{2010880B-8C19-887C-1595-9E7C819D937C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -24,6 +30,9 @@
     <ClInclude Include="src\Core\Log.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Window.h">
+      <Filter>Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Events\AppEvent.h">
       <Filter>Events</Filter>
     </ClInclude>
@@ -37,11 +46,18 @@
       <Filter>Events</Filter>
     </ClInclude>
     <ClInclude Include="src\HEngine.h" />
+    <ClInclude Include="src\Layers\Layer.h">
+      <Filter>Layers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Layers\LayerStack.h">
+      <Filter>Layers</Filter>
+    </ClInclude>
     <ClInclude Include="src\PCH\hpch.h">
       <Filter>PCH</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Window.h" />
-    <ClInclude Include="src\Platform\WindowsWindow.h" />
+    <ClInclude Include="src\Platform\WindowsWindow.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Application.cpp">
@@ -50,9 +66,17 @@
     <ClCompile Include="src\Core\Log.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Layers\Layer.cpp">
+      <Filter>Layers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Layers\LayerStack.cpp">
+      <Filter>Layers</Filter>
+    </ClCompile>
     <ClCompile Include="src\PCH\hpch.cpp">
       <Filter>PCH</Filter>
     </ClCompile>
-    <ClCompile Include="src\Platform\WindowsWindow.cpp" />
+    <ClCompile Include="src\Platform\WindowsWindow.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
