@@ -1,4 +1,4 @@
-#include "PCH/hpch.h"
+#include "hpch.h"
 #include "Log.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "GLFW/glfw3.h"

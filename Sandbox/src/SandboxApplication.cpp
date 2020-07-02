@@ -32,6 +32,7 @@ private:
 SandboxApp::SandboxApp()
 {
 	PushLayer(new ExampleLayer());
+	PushLayer(new HEngine::ImGuiLayer());
 }
 
 SandboxApp::~SandboxApp()

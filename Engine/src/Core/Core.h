@@ -26,3 +26,5 @@
 #endif
 
 #define BIT(x) (1 << x) 
+
+#define HBIND_EVENT(fn) std::bind(&fn, this, std::placeholders::_1)

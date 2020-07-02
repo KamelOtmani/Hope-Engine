@@ -1,4 +1,4 @@
-#include "PCH/hpch.h"
+#include "hpch.h"
 #include "WindowsWindow.h"
 
 #include "Events/AppEvent.h"
@@ -98,6 +98,13 @@ namespace HEngine {
 					break;
 				}
 				}
+			});
+
+		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int KeyCode)
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				KeyTypedEvent event(KeyCode);
+				data.EventCallback(event);
 			});
 
 		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)

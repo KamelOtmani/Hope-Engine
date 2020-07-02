@@ -12,17 +12,22 @@ outputdir = "%{cfg.buildcfg}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir["GLFW"] = "Engine/vendor/GLFW/include"
 IncludeDir["Glad"] = "Engine/vendor/Glad/include"
+IncludeDir["ImGui"] = "Engine/vendor/imgui"
+
+	startproject "Sandbox"
+
 
 project "Engine"
 	location "Engine"
 	kind "SharedLib"
 	language "C++"
+	staticruntime "Off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
-	pchheader "PCH/hpch.h"
-	pchsource "hpch.cpp"
+	pchheader "hpch.h"
+	pchsource "%{prj.name}/src/PCH/hpch.cpp"
 
 	files
 	{
@@ -37,19 +42,20 @@ project "Engine"
 		"%{prj.name}/src/PCH",	
 		"%{prj.name}/vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.Glad}"
+		"%{IncludeDir.Glad}",
+		"%{IncludeDir.ImGui}"
 	}
 
 	links 
 	{ 
 		"GLFW",
 		"Glad",
+		"ImGui",
 		"opengl32.lib"
 	}
 
 	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines
@@ -61,17 +67,17 @@ project "Engine"
 
 		postbuildcommands
 		{
-			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
+			("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox\"")
 		}
 
 	filter "configurations:Debug"
 		defines "HOPE_DEBUG"
-		buildoptions "/MDd"
+		runtime "Debug"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "HOPE_RELEASE"
-		buildoptions "/MD"
+		runtime "Release"
 		optimize "On"
 
 	
@@ -79,6 +85,7 @@ project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
+	staticruntime "Off"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -102,7 +109,6 @@ project "Sandbox"
 
 	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines
@@ -110,114 +116,147 @@ project "Sandbox"
 			"HOPE_PLATFORM_WINDOWS"
 		}
 
-    filter "configurations:Debug"
+	filter "configurations:Debug"
 		defines "HOPE_DEBUG"
-		buildoptions "/MDd"
+		runtime "Debug"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "HOPE_RELEASE"
-		buildoptions "/MD"
+		runtime "Release"
 		optimize "On"
 
-project "GLFW"
-	location "Engine/vendor/GLFW"
-	kind "StaticLib"
-	language "C"
+group "ThirdParty"
+	
+	project "GLFW"
+		location "Engine/vendor/GLFW"
+		kind "StaticLib"
+		language "C"
 
-	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
-
-	files
-	{
-		"Engine/vendor/GLFW/include/GLFW/glfw3.h",
-		"Engine/vendor/GLFW/include/GLFW/glfw3native.h",
-		"Engine/vendor/GLFW/src/glfw_config.h",
-		"Engine/vendor/GLFW/src/context.c",
-		"Engine/vendor/GLFW/src/init.c",
-		"Engine/vendor/GLFW/src/input.c",
-		"Engine/vendor/GLFW/src/monitor.c",
-		"Engine/vendor/GLFW/src/vulkan.c",
-		"Engine/vendor/GLFW/src/window.c"
-	}
-	filter "system:linux"
-		pic "On"
-
-		systemversion "latest"
-		staticruntime "On"
+		targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+		objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
 		files
 		{
-			"src/x11_init.c",
-			"src/x11_monitor.c",
-			"src/x11_window.c",
-			"src/xkb_unicode.c",
-			"src/posix_time.c",
-			"src/posix_thread.c",
-			"src/glx_context.c",
-			"src/egl_context.c",
-			"src/osmesa_context.c",
-			"src/linux_joystick.c"
+			"Engine/vendor/GLFW/include/GLFW/glfw3.h",
+			"Engine/vendor/GLFW/include/GLFW/glfw3native.h",
+			"Engine/vendor/GLFW/src/glfw_config.h",
+			"Engine/vendor/GLFW/src/context.c",
+			"Engine/vendor/GLFW/src/init.c",
+			"Engine/vendor/GLFW/src/input.c",
+			"Engine/vendor/GLFW/src/monitor.c",
+			"Engine/vendor/GLFW/src/vulkan.c",
+			"Engine/vendor/GLFW/src/window.c"
 		}
+		filter "system:linux"
+			pic "On"
 
-		defines
-		{
-			"_GLFW_X11"
-		}
+			systemversion "latest"
+			staticruntime "On"
 
-	filter "system:windows"
-		systemversion "latest"
-		staticruntime "On"
+			files
+			{
+				"src/x11_init.c",
+				"src/x11_monitor.c",
+				"src/x11_window.c",
+				"src/xkb_unicode.c",
+				"src/posix_time.c",
+				"src/posix_thread.c",
+				"src/glx_context.c",
+				"src/egl_context.c",
+				"src/osmesa_context.c",
+				"src/linux_joystick.c"
+			}
+
+			defines
+			{
+				"_GLFW_X11"
+			}
+
+		filter "system:windows"
+			systemversion "latest"
+			staticruntime "On"
+
+			files
+			{
+				"Engine/vendor/GLFW/src/win32_init.c",
+				"Engine/vendor/GLFW/src/win32_joystick.c",
+				"Engine/vendor/GLFW/src/win32_monitor.c",
+				"Engine/vendor/GLFW/src/win32_time.c",
+				"Engine/vendor/GLFW/src/win32_thread.c",
+				"Engine/vendor/GLFW/src/win32_window.c",
+				"Engine/vendor/GLFW/src/wgl_context.c",
+				"Engine/vendor/GLFW/src/egl_context.c",
+				"Engine/vendor/GLFW/src/osmesa_context.c"
+			}
+
+			defines 
+			{ 
+				"_GLFW_WIN32",
+				"_CRT_SECURE_NO_WARNINGS"
+			}
+
+		filter "configurations:Debug"
+			runtime "Debug"
+			symbols "on"
+
+		filter "configurations:Release"
+			runtime "Release"
+			optimize "on"
+
+	project "Glad"
+		kind "StaticLib"
+		language "C"
+
+		targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+		objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
 		files
 		{
-			"Engine/vendor/GLFW/src/win32_init.c",
-			"Engine/vendor/GLFW/src/win32_joystick.c",
-			"Engine/vendor/GLFW/src/win32_monitor.c",
-			"Engine/vendor/GLFW/src/win32_time.c",
-			"Engine/vendor/GLFW/src/win32_thread.c",
-			"Engine/vendor/GLFW/src/win32_window.c",
-			"Engine/vendor/GLFW/src/wgl_context.c",
-			"Engine/vendor/GLFW/src/egl_context.c",
-			"Engine/vendor/GLFW/src/osmesa_context.c"
+			"Engine/vendor/Glad/include/glad/glad.h",
+			"Engine/vendor/Glad/include/KHR/khrplatform.h",
+			"Engine/vendor/Glad/src/glad.c"
 		}
 
-		defines 
-		{ 
-			"_GLFW_WIN32",
-			"_CRT_SECURE_NO_WARNINGS"
+		includedirs
+		{
+			"Engine/vendor/Glad/include"
 		}
 
-	filter "configurations:Debug"
-		runtime "Debug"
-		symbols "on"
+		filter "system:windows"
+			systemversion "latest"
+			staticruntime "On"
 
-	filter "configurations:Release"
-		runtime "Release"
-		optimize "on"
+		filter { "system:windows", "configurations:Release" }
+			buildoptions "/MT" 
+			
+	project "ImGui"
+		kind "StaticLib"
+		language "C++"
+		
+		targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+		objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
-project "Glad"
-    kind "StaticLib"
-    language "C"
+		files
+		{
+			"Engine/vendor/imgui/imconfig.h",
+			"Engine/vendor/imgui/imgui.h",
+			"Engine/vendor/imgui/imgui.cpp",
+			"Engine/vendor/imgui/imgui_draw.cpp",
+			"Engine/vendor/imgui/imgui_internal.h",
+			"Engine/vendor/imgui/imgui_widgets.cpp",
+			"Engine/vendor/imgui/imstb_rectpack.h",
+			"Engine/vendor/imgui/imstb_textedit.h",
+			"Engine/vendor/imgui/imstb_truetype.h",
+			"Engine/vendor/imgui/imgui_demo.cpp"
+		}
+		
+		filter "system:windows"
+			systemversion "latest"
+			cppdialect "C++17"
+			staticruntime "On"
+			
+		filter { "system:windows", "configurations:Release" }
+			buildoptions "/MT"
 
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
-
-    files
-    {
-        "Engine/vendor/Glad/include/glad/glad.h",
-        "Engine/vendor/Glad/include/KHR/khrplatform.h",
-        "Engine/vendor/Glad/src/glad.c"
-    }
-
-	includedirs
-	{
-		"Engine/vendor/Glad/include"
-	}
-
-    filter "system:windows"
-        systemversion "latest"
-        staticruntime "On"
-
-    filter { "system:windows", "configurations:Release" }
-        buildoptions "/MT" 
+group ""
