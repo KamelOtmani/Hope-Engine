@@ -9,12 +9,16 @@ public:
 
 	void OnUpdate() override
 	{
-		HLOG("ExampleLayer::Update");
+		if (HEngine::Input::IsKeyPressed(HKEY_TAB))
+		{
+			HLOG("Tab was pressed");
+		}
+		
 	}
 
 	void OnEvent(HEngine::Event& event) override
 	{
-		HINFO("{0}", event);
+		
 	}
 
 };

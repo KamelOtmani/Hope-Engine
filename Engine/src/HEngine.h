@@ -8,6 +8,9 @@
 #include "Layers/Layer.h"
 #include "Layers/ImGuiLayer.h"
 #include "Events/Event.h"
+#include "Core/Input.h"
+#include "Events/KeyCodes.h"
+#include "Types.h"
 //----------------------------------------
 // STD Library
 //----------------------------------------

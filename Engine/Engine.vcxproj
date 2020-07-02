@@ -106,11 +106,13 @@
     <ClInclude Include="src\Core\Application.h" />
     <ClInclude Include="src\Core\Core.h" />
     <ClInclude Include="src\Core\EntryPoint.h" />
+    <ClInclude Include="src\Core\Input.h" />
     <ClInclude Include="src\Core\Log.h" />
     <ClInclude Include="src\Core\Window.h" />
     <ClInclude Include="src\Events\AppEvent.h" />
     <ClInclude Include="src\Events\Event.h" />
     <ClInclude Include="src\Events\KeyboardEvent.h" />
+    <ClInclude Include="src\Events\KeyCodes.h" />
     <ClInclude Include="src\Events\MouseEvent.h" />
     <ClInclude Include="src\HEngine.h" />
     <ClInclude Include="src\Layers\ImGuiLayer.h" />
@@ -119,6 +121,7 @@
     <ClInclude Include="src\PCH\hpch.h" />
     <ClInclude Include="src\Platform\OpenGl\ImGuiOpenGLRenderer.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
+    <ClInclude Include="src\Platform\Windows\WinInput.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Application.cpp" />
@@ -131,6 +134,7 @@
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGl\ImGuiOpenGLRenderer.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
+    <ClCompile Include="src\Platform\Windows\WinInput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\GLFW\GLFW.vcxproj">
