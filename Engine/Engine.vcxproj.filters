@@ -40,6 +40,8 @@
     <ClInclude Include="src\PCH\hpch.h">
       <Filter>PCH</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\Window.h" />
+    <ClInclude Include="src\Platform\WindowsWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Application.cpp">
@@ -51,5 +53,6 @@
     <ClCompile Include="src\PCH\hpch.cpp">
       <Filter>PCH</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\WindowsWindow.cpp" />
   </ItemGroup>
 </Project>

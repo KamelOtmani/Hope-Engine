@@ -9,6 +9,9 @@ workspace "Hope Engine"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.architecture}"
 
+IncludeDir = {}
+IncludeDir["GLFW"] = "Engine/vendor/GLFW/include"
+
 project "Engine"
 	location "Engine"
 	kind "SharedLib"
@@ -18,7 +21,7 @@ project "Engine"
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
 	pchheader "PCH/hpch.h"
-	pchsource "PCH/hpch.cpp"
+	pchsource "hpch.cpp"
 
 	files
 	{
@@ -30,7 +33,15 @@ project "Engine"
 	{
 		"%{prj.name}/vendor/spdlog/include",
 		"%{prj.name}/src/",
-		"%{prj.name}/src/PCH"
+		"%{prj.name}/src/PCH",	
+		"%{prj.name}/vendor/spdlog/include",
+		"%{IncludeDir.GLFW}"
+	}
+
+	links 
+	{ 
+		"GLFW",
+		"opengl32.lib"
 	}
 
 	filter "system:windows"
@@ -100,3 +111,79 @@ project "Sandbox"
 	filter "configurations:Release"
 		defines "HOPE_RELEASE"
 		optimize "On"
+
+project "GLFW"
+	location "Engine/vendor/GLFW"
+	kind "StaticLib"
+	language "C"
+
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	files
+	{
+		"Engine/vendor/GLFW/include/GLFW/glfw3.h",
+		"Engine/vendor/GLFW/include/GLFW/glfw3native.h",
+		"Engine/vendor/GLFW/src/glfw_config.h",
+		"Engine/vendor/GLFW/src/context.c",
+		"Engine/vendor/GLFW/src/init.c",
+		"Engine/vendor/GLFW/src/input.c",
+		"Engine/vendor/GLFW/src/monitor.c",
+		"Engine/vendor/GLFW/src/vulkan.c",
+		"Engine/vendor/GLFW/src/window.c"
+	}
+	filter "system:linux"
+		pic "On"
+
+		systemversion "latest"
+		staticruntime "On"
+
+		files
+		{
+			"src/x11_init.c",
+			"src/x11_monitor.c",
+			"src/x11_window.c",
+			"src/xkb_unicode.c",
+			"src/posix_time.c",
+			"src/posix_thread.c",
+			"src/glx_context.c",
+			"src/egl_context.c",
+			"src/osmesa_context.c",
+			"src/linux_joystick.c"
+		}
+
+		defines
+		{
+			"_GLFW_X11"
+		}
+
+	filter "system:windows"
+		systemversion "latest"
+		staticruntime "On"
+
+		files
+		{
+			"Engine/vendor/GLFW/src/win32_init.c",
+			"Engine/vendor/GLFW/src/win32_joystick.c",
+			"Engine/vendor/GLFW/src/win32_monitor.c",
+			"Engine/vendor/GLFW/src/win32_time.c",
+			"Engine/vendor/GLFW/src/win32_thread.c",
+			"Engine/vendor/GLFW/src/win32_window.c",
+			"Engine/vendor/GLFW/src/wgl_context.c",
+			"Engine/vendor/GLFW/src/egl_context.c",
+			"Engine/vendor/GLFW/src/osmesa_context.c"
+		}
+
+		defines 
+		{ 
+			"_GLFW_WIN32",
+			"_CRT_SECURE_NO_WARNINGS"
+		}
+
+	filter "configurations:Debug"
+		runtime "Debug"
+		symbols "on"
+
+	filter "configurations:Release"
+		runtime "Release"
+		optimize "on"

@@ -2,31 +2,29 @@
 #include "Application.h"
 #include "Log.h"
 #include "Events/AppEvent.h"
+#include "GLFW/glfw3.h"
 
 #include <iostream>
 
-HEngine::Application::Application()
-{
-}
+namespace HEngine {
 
-HEngine::Application::~Application()
-{
-}
 
-void HEngine::Application::Run()
-{
-	WindowResizeEvent e(1280, 720);
-	if (e.IsInCategory(EventCategoryApplication))
+	Application::Application()
 	{
-		HLOG(e);
-	}
-	if (e.IsInCategory(EventCategoryInput))
-	{
-		HLOG(e);
+		m_Window = std::unique_ptr<Window>(Window::Create());
 	}
 
-	while (true)
+	Application::~Application()
 	{
-		// Loop
+	}
+
+	void Application::Run()
+	{
+		while (m_Running)
+		{
+			glClearColor(1, 0, 1, 1);
+			glClear(GL_COLOR_BUFFER_BIT);
+			m_Window->OnUpdate();
+		}
 	}
 }
