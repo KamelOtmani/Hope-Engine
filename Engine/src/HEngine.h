@@ -10,7 +10,8 @@
 #include "Events/Event.h"
 #include "Core/Input.h"
 #include "Events/KeyCodes.h"
-#include "Types.h"
+#include "HTypes.h"
+#include "glm/glm.hpp"
 //----------------------------------------
 // STD Library
 //----------------------------------------

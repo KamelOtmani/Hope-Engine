@@ -6,11 +6,12 @@
 #include "Events/MouseEvent.h" 
 #include "Events/KeyboardEvent.h"
 
-#include <glad/glad.h>
+#include "Platform/OpenGl/Renderer/GLContext.h"
+
 
 namespace HEngine {
 
-    static bool s_GLFWInitialized = false;
+	static bool s_GLFWInitialized = false;
 
 	static void GLFWErrorCallback(int error, const char* description)
 	{
@@ -38,7 +39,7 @@ namespace HEngine {
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
 
-		HEngineLOG("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+		HEngineINFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
 		if (!s_GLFWInitialized)
 		{
@@ -50,13 +51,15 @@ namespace HEngine {
 		}
 
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(m_Window);
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		HENGINE_ASSERT(status, "Failed to init Glad");
+
+		m_Context = new GLContext(m_Window);
+		m_Context->Init();
+
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
 
-		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height) 
+		// Set GLFW callbacks
+		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 				data.Width = width;
@@ -64,8 +67,8 @@ namespace HEngine {
 
 				WindowResizeEvent event(width, height);
 				data.EventCallback(event);
-				
 			});
+
 		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
@@ -100,10 +103,11 @@ namespace HEngine {
 				}
 			});
 
-		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int KeyCode)
+		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int keycode)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-				KeyTypedEvent event(KeyCode);
+
+				KeyTypedEvent event(keycode);
 				data.EventCallback(event);
 			});
 
@@ -153,7 +157,7 @@ namespace HEngine {
 	void WindowsWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(m_Window);
+		m_Context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)

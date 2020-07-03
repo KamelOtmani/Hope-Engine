@@ -13,15 +13,17 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Engine/vendor/GLFW/include"
 IncludeDir["Glad"] = "Engine/vendor/Glad/include"
 IncludeDir["ImGui"] = "Engine/vendor/imgui"
+IncludeDir["glm"] = "Engine/vendor/glm"
 
 	startproject "Sandbox"
 
 
 project "Engine"
 	location "Engine"
-	kind "SharedLib"
+	kind "StaticLib"
 	language "C++"
-	staticruntime "Off"
+	cppdialect "C++17"
+	staticruntime "On"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -43,7 +45,8 @@ project "Engine"
 		"%{prj.name}/vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.glm}"
 	}
 
 	links 
@@ -53,9 +56,12 @@ project "Engine"
 		"ImGui",
 		"opengl32.lib"
 	}
+	defines 
+	{
+		"_CRT_SECURE_NO_WARNINGS"
+	}
 
 	filter "system:windows"
-		cppdialect "C++17"
 		systemversion "latest"
 
 		defines
@@ -65,10 +71,6 @@ project "Engine"
 			"GLFW_INCLUDE_NONE"
 		}
 
-		postbuildcommands
-		{
-			("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox\"")
-		}
 
 	filter "configurations:Debug"
 		defines "HOPE_DEBUG"
@@ -85,7 +87,8 @@ project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
-	staticruntime "Off"
+	cppdialect "C++17"
+	staticruntime "On"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -99,7 +102,8 @@ project "Sandbox"
 	includedirs
 	{
 		"Engine/vendor/spdlog/include",
-		"Engine/src"
+		"Engine/src",
+		"%{IncludeDir.glm}"
 	}
 
 	links
@@ -108,7 +112,6 @@ project "Sandbox"
 	}
 
 	filter "system:windows"
-		cppdialect "C++17"
 		systemversion "latest"
 
 		defines
@@ -132,6 +135,7 @@ group "ThirdParty"
 		location "Engine/vendor/GLFW"
 		kind "StaticLib"
 		language "C"
+		staticruntime "On"
 
 		targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 		objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -152,7 +156,6 @@ group "ThirdParty"
 			pic "On"
 
 			systemversion "latest"
-			staticruntime "On"
 
 			files
 			{
@@ -170,12 +173,11 @@ group "ThirdParty"
 
 			defines
 			{
-				"_GLFW_X11"
+				--"_GLFW_X11"
 			}
 
 		filter "system:windows"
 			systemversion "latest"
-			staticruntime "On"
 
 			files
 			{
@@ -207,6 +209,7 @@ group "ThirdParty"
 	project "Glad"
 		kind "StaticLib"
 		language "C"
+		staticruntime "On"
 
 		targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 		objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -225,14 +228,20 @@ group "ThirdParty"
 
 		filter "system:windows"
 			systemversion "latest"
-			staticruntime "On"
 
-		filter { "system:windows", "configurations:Release" }
-			buildoptions "/MT" 
+			filter "configurations:Debug"
+			runtime "Debug"
+			symbols "on"
+
+		filter "configurations:Release"
+			runtime "Release"
+			optimize "on"
 			
 	project "ImGui"
 		kind "StaticLib"
 		language "C++"
+		cppdialect "C++17"
+		staticruntime "On"
 		
 		targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 		objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -253,10 +262,14 @@ group "ThirdParty"
 		
 		filter "system:windows"
 			systemversion "latest"
-			cppdialect "C++17"
-			staticruntime "On"
 			
-		filter { "system:windows", "configurations:Release" }
-			buildoptions "/MT"
+		
+			filter "configurations:Debug"
+			runtime "Debug"
+			symbols "on"
+
+		filter "configurations:Release"
+			runtime "Release"
+			optimize "on"
 
 group ""

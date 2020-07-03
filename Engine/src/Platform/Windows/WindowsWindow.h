@@ -1,7 +1,8 @@
 #pragma once
 #include "Core/Window.h"
-#include <GLFW/glfw3.h>
+#include "Renderer/GraphicsContext.h"
 
+#include <GLFW/glfw3.h>
 namespace HEngine {
 
 	class WindowsWindow : public Window
@@ -25,6 +26,7 @@ namespace HEngine {
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
 	private:
+		GraphicsContext* m_Context;
 		GLFWwindow* m_Window;
 
 		struct WindowData

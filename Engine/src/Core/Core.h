@@ -1,11 +1,20 @@
 #pragma once
 
+#include "HTypes.h"
+
+#define HOPE_DYNAMIC_LINK 0
+
 #ifdef HOPE_PLATFORM_WINDOWS
-    #ifdef HOPE_BUILD_DLL
-        #define HOPE_API __declspec(dllexport)
+    #if HOPE_DYNAMIC_LINK
+
+        #ifdef HOPE_BUILD_DLL
+            #define HOPE_API __declspec(dllexport)
+        #else
+            #define HOPE_API __declspec(dllimport)
+        #endif
     #else
-        #define HOPE_API __declspec(dllimport)
-    #endif
+        #define HOPE_API
+#endif // HOPE_DYNAMIC_LINK
 #else
     #error HEngine only supports Windows!
 #endif

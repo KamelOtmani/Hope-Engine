@@ -5,7 +5,11 @@
 #include "Events/Event.h"
 #include "Events/AppEvent.h"
 #include "Layers/LayerStack.h"
+#include "Layers/ImGuiLayer.h"
 
+#include "Renderer/Shader.h"
+#include <Renderer/Core/Buffer.h>
+#include <Renderer/Core/VertexArray.h>
 
 namespace HEngine {
 
@@ -26,9 +30,14 @@ namespace HEngine {
 		inline Window& GetWindow() { return *m_Window; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
+
 		std::unique_ptr<Window> m_Window;
+		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
+
+		std::shared_ptr<Shader> m_Shader;
+		std::shared_ptr<VertexArray> m_VertexArray;
 	private:
 		static Application* s_Instance;
 	};

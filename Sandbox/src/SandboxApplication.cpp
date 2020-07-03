@@ -9,10 +9,6 @@ public:
 
 	void OnUpdate() override
 	{
-		if (HEngine::Input::IsKeyPressed(HKEY_TAB))
-		{
-			HLOG("Tab was pressed");
-		}
 		
 	}
 
@@ -36,7 +32,6 @@ private:
 SandboxApp::SandboxApp()
 {
 	PushLayer(new ExampleLayer());
-	PushLayer(new HEngine::ImGuiLayer());
 }
 
 SandboxApp::~SandboxApp()
