@@ -97,9 +97,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Renderer\Material.h" />
     <ClInclude Include="src\ECS\Entity.h" />
-    <ClInclude Include="src\Renderer\Mesh.h" />
     <ClInclude Include="src\Renderer\Commun.h" />
     <ClInclude Include="src\Renderer\Scene.h" />
     <ClInclude Include="src\Core\Application.h" />
@@ -134,9 +132,7 @@
     <ClInclude Include="src\Renderer\Shader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Renderer\Material.cpp" />
     <ClCompile Include="src\ECS\Entity.cpp" />
-    <ClCompile Include="src\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Renderer\Scene.cpp" />
     <ClCompile Include="src\Core\Application.cpp" />
     <ClCompile Include="src\Core\Log.cpp" />

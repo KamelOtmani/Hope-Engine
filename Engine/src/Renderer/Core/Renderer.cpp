@@ -5,6 +5,9 @@
 #include "Renderer/Material.h"
 
 namespace HEngine {
+	void Renderer::Initialise()
+	{
+	}
 	void Renderer::prepareScene(Scene* scene)
 	{
 		//HLOG("Preparing scene");
@@ -13,18 +16,24 @@ namespace HEngine {
 	}
 	void Renderer::submitScene(Scene* scene)
 	{
-
-		for (auto& mesh : scene->entityList)
+		auto cam = scene->CameraList[0];
+		if (cam)
 		{
-			if (mesh.shouldUpdate())
-				mesh.updateMesh();
-			if (mesh.mat.shader)
+			for (auto& mesh : scene->entityList)
 			{
-				mesh.mat.shader->Bind();
-			}
-			mesh.getVertexArray()->Bind();
-			RHICommand::DrawIndexed(mesh.getVertexArray());
+				if (mesh.shouldUpdate())
+					mesh.updateMesh();
+				if (mesh.mat.shader)
+				{
+					mesh.mat.shader->Bind();
+					mesh.mat.shader->SetMat4("u_Transform", mesh.transform.ModelMatrix());
+					//HLOG("Camera position = {0},{1},{2}", cam->transform.Position.x, cam->transform.Position.y, cam->transform.Position.z);
+					mesh.mat.shader->SetMat4("u_ViewProjection", cam->ViewProjectionMatrix());
+				}
+				mesh.getVertexArray()->Bind();
+				RHICommand::DrawIndexed(mesh.getVertexArray());
 
+			}
 		}
 		//HLOG("Submiting scene");
 	}

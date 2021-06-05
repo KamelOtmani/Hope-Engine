@@ -19,6 +19,23 @@ namespace HEngine {
 		Shader(const std::string& filepath);
 		~Shader();
 
+		
+		virtual void SetInt(const std::string& name, int value) ;
+		virtual void SetFloat3(const std::string& name, const Vec3& value);
+		virtual void SetFloat4(const std::string& name, const Vec4& value) ;
+		virtual void SetMat4(const std::string& name, const glm::mat4& value) ;
+
+		void UploadUniformInt(const std::string& name, int value);
+
+		void UploadUniformFloat(const std::string& name, float value);
+		void UploadUniformFloat2(const std::string& name, const Vec2& value);
+		void UploadUniformFloat3(const std::string& name, const Vec3& value);
+		void UploadUniformFloat4(const std::string& name, const Vec4& value);
+
+		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix);
+		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
+
+
 		std::string readFile(const std::string& filepath);
 		std::unordered_map<uint32_t, std::string> preProcess(const std::string& source);
 		void compile(const std::unordered_map<uint32_t, std::string>& shaderSources);

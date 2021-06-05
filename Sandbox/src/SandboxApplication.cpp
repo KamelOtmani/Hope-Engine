@@ -1,6 +1,9 @@
 #include <HEngine.h>
 #include <ECS\Entity.h>
 #include "Renderer/Shader.h"
+#include "../../Engine/vendor/imgui/imgui.h"
+#include <glm\gtc\type_ptr.hpp>
+//#include ""
 
 using namespace HEngine;
 
@@ -40,12 +43,32 @@ public:
 		lol.updateMesh();
 		_scene->entityList.push_back(lol);
 
+		auto cam = new Camera;
+		_scene->CameraList.push_back(cam);
+
 	}
 
 	void OnUpdate() override
 	{
-		//HEngine::Renderer::prepareScene(_scene.get());
+		HEngine::Renderer::prepareScene(_scene.get());
 		HEngine::Renderer::submitScene(_scene.get());
+	}
+	void OnImGuiRender() override
+	{
+		ImGui::Begin("Scene");
+
+
+		ImGui::End();
+
+		ImGui::Begin("Camera");
+		ImGui::DragFloat3("Position", glm::value_ptr(_scene->CameraList[0]->transform.Position),0.1f);
+		ImGui::DragFloat3("Rotation", glm::value_ptr(_scene->CameraList[0]->transform.Rotation), 0.1f);
+		ImGui::Separator();
+		ImGui::DragFloat("FOV", &_scene->CameraList[0]->cam.fov);
+		ImGui::DragFloat("Far plane", &_scene->CameraList[0]->cam.farPlane);
+		ImGui::DragFloat("Near Plane", &_scene->CameraList[0]->cam.nearPlane);
+
+		ImGui::End();
 	}
 
 	void OnEvent(HEngine::Event& event) override

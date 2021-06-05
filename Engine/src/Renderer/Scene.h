@@ -5,6 +5,7 @@ namespace HEngine {
 
     class Model;
     class Shader;
+    class Camera;
     
 
     class Scene 
@@ -16,6 +17,7 @@ namespace HEngine {
     
         std::vector<Model> entityList;
         std::vector<Shader*> shaderList;
+        std::vector<Camera*> CameraList;
     };
 
 }

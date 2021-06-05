@@ -113,11 +113,6 @@ namespace HEngine {
 	{
 		while (m_Running)
 		{
-			Renderer::BeginScene();
-			m_Shader->Bind();
-			Renderer::Submit(m_VertexArray);
-
-			Renderer::EndScene();
 
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();

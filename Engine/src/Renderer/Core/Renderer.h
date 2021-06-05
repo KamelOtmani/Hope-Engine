@@ -8,8 +8,9 @@ namespace HEngine {
 	class Renderer
 	{
 	public:
-		Renderer() { HLOG("Constuct"); }
+	Renderer() { HLOG("Constuct"); }
 
+	static void Initialise();
 	//static void setupScene(Scene* scene);
 	static void prepareScene(Scene* scene);
 	static void submitScene(Scene* scene);
