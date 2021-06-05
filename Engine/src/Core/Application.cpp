@@ -25,14 +25,25 @@ namespace HEngine {
 
 		m_VertexArray.reset(VertexArray::Create());
 
+		std::vector<FVertex> verts{
+			{ Vec3{-0.5f, -0.5f, 0.0f},Vec4{0.8f, 0.2f, 0.8f, 1.0f} },
+			{ Vec3{0.5f, -0.5f, 0.0f},Vec4{0.2f, 0.3f, 0.8f, 1.0f} },
+			{ Vec3{0.0f, -0.0f, 0.0f},Vec4{0.8f, 0.8f, 0.2f, 1.0f} } };
+
+
 		float vertices[3 * 7] = {
 			-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
 			 0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
-			 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
+			 0.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
 		};
+		auto s1 = sizeof(vertices);
+		auto s2 = sizeof(Vec3);
+		auto s5 = sizeof(Vec4);
+		auto s4 = sizeof(verts);
+		auto s3 = verts.size();
 
 		std::shared_ptr<VertexBuffer> vertexBuffer;
-		vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+		vertexBuffer.reset(VertexBuffer::Create(verts, verts.size()*(sizeof(Vec3)+ sizeof(Vec4))));
 		BufferLayout layout = {
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float4, "a_Color" }
@@ -44,6 +55,9 @@ namespace HEngine {
 		std::shared_ptr<IndexBuffer> indexBuffer;
 		indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
 		m_VertexArray->SetIndexBuffer(indexBuffer);
+		auto d1 = sizeof(indices);
+		auto d2 = sizeof(uint32_t);
+		auto d3 = verts.size();
 
 		std::string vertexSrc = R"(
 			#version 330 core
@@ -100,7 +114,7 @@ namespace HEngine {
 		while (m_Running)
 		{
 			Renderer::BeginScene();
-
+			m_Shader->Bind();
 			Renderer::Submit(m_VertexArray);
 
 			Renderer::EndScene();

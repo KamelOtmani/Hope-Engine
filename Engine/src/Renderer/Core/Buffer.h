@@ -1,4 +1,5 @@
 #pragma once
+#include <Renderer\Commun.h>
 
 namespace HEngine {
 	enum class ShaderDataType
@@ -111,6 +112,7 @@ namespace HEngine {
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 
 		static VertexBuffer* Create(float* vertices, uint32_t size);
+		static VertexBuffer* Create(std::vector<FVertex>& vertices, uint32_t size);
 	};
 
 	class IndexBuffer

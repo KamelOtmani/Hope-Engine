@@ -11,9 +11,18 @@ namespace HEngine {
 
 	GLVertexBuffer::GLVertexBuffer(float* vertices, uint32_t size)
 	{
+		auto data = vertices;
 		glCreateBuffers(1, &m_ID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
 		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+	}
+
+	GLVertexBuffer::GLVertexBuffer(std::vector<FVertex>& vertices, uint32_t size)
+	{
+		auto data = (float*)vertices.data();
+		glCreateBuffers(1, &m_ID);
+		glBindBuffer(GL_ARRAY_BUFFER, m_ID);
+		glBufferData(GL_ARRAY_BUFFER, size, data , GL_STATIC_DRAW);
 	}
 
 	GLVertexBuffer::~GLVertexBuffer()

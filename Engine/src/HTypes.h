@@ -4,13 +4,13 @@
 //#include "Layers/ImGuiLayer.h"
 
 
-typedef glm::vec4 Vec4;
-typedef glm::vec3 Vec3;
+using Vec4 = glm::vec4;
+using Vec3 = glm::vec3;
 
 //typedef ImVec2 Vec2;
 
-typedef glm::mat4 Mat4;
-typedef glm::mat3 Mat3;
-typedef glm::mat2 Mat2;
+using Mat4 = glm::mat4;
+using Mat3 = glm::mat3;
+using Mat2 = glm::mat2 ;
 
 

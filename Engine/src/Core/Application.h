@@ -8,6 +8,7 @@
 #include "Layers/ImGuiLayer.h"
 
 #include "Renderer/Shader.h"
+
 #include <Renderer/Core/Buffer.h>
 #include <Renderer/Core/VertexArray.h>
 
@@ -30,6 +31,10 @@ namespace HEngine {
 		inline Window& GetWindow() { return *m_Window; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
+
+		//std::unique_ptr<Scene> m_Window;
+		// Old stuff
+		// TODO : Remove all the stuff that is not needed for the app
 
 		std::unique_ptr<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;

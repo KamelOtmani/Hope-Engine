@@ -97,15 +97,11 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Platform\OpenGl\Renderer\OpenGLRenderer.h" />
-    <ClInclude Include="src\Renderer\RHI\RHI.h" />
-    <ClInclude Include="src\Renderer\RHI\RHICommand.h" />
-    <ClInclude Include="src\Platform\OpenGl\Renderer\GLVertexArray.h" />
-    <ClInclude Include="src\Platform\OpenGl\Renderer\GlBuffer.h" />
-    <ClInclude Include="src\Renderer\Core\Buffer.h" />
-    <ClInclude Include="src\Renderer\Core\Renderer.h" />
-    <ClInclude Include="src\Renderer\Shader.h" />
-    <ClInclude Include="src\Platform\OpenGl\Renderer\GLContext.h" />
+    <ClInclude Include="src\Renderer\Material.h" />
+    <ClInclude Include="src\ECS\Entity.h" />
+    <ClInclude Include="src\Renderer\Mesh.h" />
+    <ClInclude Include="src\Renderer\Commun.h" />
+    <ClInclude Include="src\Renderer\Scene.h" />
     <ClInclude Include="src\Core\Application.h" />
     <ClInclude Include="src\Core\Core.h" />
     <ClInclude Include="src\Core\EntryPoint.h" />
@@ -118,26 +114,30 @@
     <ClInclude Include="src\Events\KeyboardEvent.h" />
     <ClInclude Include="src\Events\MouseEvent.h" />
     <ClInclude Include="src\HEngine.h" />
+    <ClInclude Include="src\HTypes.h" />
     <ClInclude Include="src\Layers\ImGuiLayer.h" />
     <ClInclude Include="src\Layers\Layer.h" />
     <ClInclude Include="src\Layers\LayerStack.h" />
     <ClInclude Include="src\PCH\hpch.h" />
+    <ClInclude Include="src\Platform\OpenGl\Renderer\GLContext.h" />
+    <ClInclude Include="src\Platform\OpenGl\Renderer\GLVertexArray.h" />
+    <ClInclude Include="src\Platform\OpenGl\Renderer\GlBuffer.h" />
+    <ClInclude Include="src\Platform\OpenGl\Renderer\OpenGLRenderer.h" />
     <ClInclude Include="src\Platform\Windows\WinInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
-    <ClInclude Include="src\Renderer\GraphicsContext.h" />
-    <ClInclude Include="src\HTypes.h" />
+    <ClInclude Include="src\Renderer\Core\Buffer.h" />
+    <ClInclude Include="src\Renderer\Core\Renderer.h" />
     <ClInclude Include="src\Renderer\Core\VertexArray.h" />
+    <ClInclude Include="src\Renderer\GraphicsContext.h" />
+    <ClInclude Include="src\Renderer\RHI\RHI.h" />
+    <ClInclude Include="src\Renderer\RHI\RHICommand.h" />
+    <ClInclude Include="src\Renderer\Shader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Platform\OpenGl\Renderer\OpenGLRenderer.cpp" />
-    <ClCompile Include="src\Renderer\RHI\RHI.cpp" />
-    <ClCompile Include="src\Renderer\RHI\RHICommand.cpp" />
-    <ClCompile Include="src\Platform\OpenGl\Renderer\GLVertexArray.cpp" />
-    <ClCompile Include="src\Platform\OpenGl\Renderer\GlBuffer.cpp" />
-    <ClCompile Include="src\Renderer\Core\Buffer.cpp" />
-    <ClCompile Include="src\Renderer\Core\Renderer.cpp" />
-    <ClCompile Include="src\Renderer\Shader.cpp" />
-    <ClCompile Include="src\Platform\OpenGl\Renderer\GLContext.cpp" />
+    <ClCompile Include="src\Renderer\Material.cpp" />
+    <ClCompile Include="src\ECS\Entity.cpp" />
+    <ClCompile Include="src\Renderer\Mesh.cpp" />
+    <ClCompile Include="src\Renderer\Scene.cpp" />
     <ClCompile Include="src\Core\Application.cpp" />
     <ClCompile Include="src\Core\Log.cpp" />
     <ClCompile Include="src\Layers\ImGuiBuild.cpp" />
@@ -147,9 +147,18 @@
     <ClCompile Include="src\PCH\hpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Platform\OpenGl\Renderer\GLContext.cpp" />
+    <ClCompile Include="src\Platform\OpenGl\Renderer\GLVertexArray.cpp" />
+    <ClCompile Include="src\Platform\OpenGl\Renderer\GlBuffer.cpp" />
+    <ClCompile Include="src\Platform\OpenGl\Renderer\OpenGLRenderer.cpp" />
     <ClCompile Include="src\Platform\Windows\WinInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
+    <ClCompile Include="src\Renderer\Core\Buffer.cpp" />
+    <ClCompile Include="src\Renderer\Core\Renderer.cpp" />
     <ClCompile Include="src\Renderer\Core\VertexArray.cpp" />
+    <ClCompile Include="src\Renderer\RHI\RHI.cpp" />
+    <ClCompile Include="src\Renderer\RHI\RHICommand.cpp" />
+    <ClCompile Include="src\Renderer\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\GLFW\GLFW.vcxproj">

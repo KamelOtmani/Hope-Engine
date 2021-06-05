@@ -10,8 +10,14 @@
 #include "Events/Event.h"
 #include "Core/Input.h"
 #include "Events/KeyCodes.h"
-#include "HTypes.h"
 #include "glm/glm.hpp"
+#include "HTypes.h"
+
+//----------------------------------------
+// CORE
+//----------------------------------------
+#include "Renderer/Scene.h"
+#include "Renderer/Core/Renderer.h"
 //----------------------------------------
 // STD Library
 //----------------------------------------
