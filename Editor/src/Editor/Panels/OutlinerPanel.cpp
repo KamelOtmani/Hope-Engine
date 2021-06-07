@@ -7,12 +7,12 @@
 
 using namespace HEngine;
 
-OutlinerPanel::OutlinerPanel(const std::shared_ptr<Scene>& context)
+OutlinerPanel::OutlinerPanel(const Ref<Scene>& context)
 {
     SetContext(context);
 }
 
-void OutlinerPanel::SetContext(const std::shared_ptr<Scene>& context)
+void OutlinerPanel::SetContext(const Ref<Scene>& context)
 {
     m_Scene = context;
 }

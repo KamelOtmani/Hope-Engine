@@ -42,8 +42,8 @@ namespace HEngine {
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 
-		std::shared_ptr<Shader> m_Shader;
-		std::shared_ptr<VertexArray> m_VertexArray;
+        Ref<Shader> m_Shader;
+        Ref<VertexArray> m_VertexArray;
 	private:
 		static Application* s_Instance;
 	};

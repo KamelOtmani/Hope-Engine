@@ -64,7 +64,7 @@ namespace HEngine
             _data = vertices;
             _indices = indices;
             vertexArray.reset(VertexArray::Create());
-            std::shared_ptr<VertexBuffer> vertexBuffer;
+            Ref<VertexBuffer> vertexBuffer;
             vertexBuffer.reset(VertexBuffer::Create(vertices, vertices.size() * (sizeof(Vec3) + sizeof(Vec4))));
             BufferLayout layout = {
                 { ShaderDataType::Float3, "a_Position" },
@@ -73,14 +73,14 @@ namespace HEngine
             vertexBuffer->SetLayout(layout);
             vertexArray->AddVertexBuffer(vertexBuffer);
 
-            std::shared_ptr<IndexBuffer> indexBuffer;
+            Ref<IndexBuffer> indexBuffer;
             indexBuffer.reset(IndexBuffer::Create(indices.data(), indices.size()));
             vertexArray->SetIndexBuffer(indexBuffer);
         }
         ~MeshRendererComponent() = default;
-        std::shared_ptr<VertexArray> vertexArray;
+        Ref<VertexArray> vertexArray;
         Shader* shader = nullptr;
-        std::shared_ptr<VertexArray>& getVertexArray() { return vertexArray; };
+        Ref<VertexArray>& getVertexArray() { return vertexArray; };
     private:
         std::vector<FVertex> _data;
         std::vector<uint32_t> _indices;

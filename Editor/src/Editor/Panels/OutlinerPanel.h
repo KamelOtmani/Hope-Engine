@@ -1,22 +1,22 @@
 #pragma once
-
+#include "HEngine.h"
 #include "ECS/Entity.h"
-#include "ECS/Entity.h"
+#include "ECS/Scene.h"
 
 
 class OutlinerPanel
 {
 public:
     OutlinerPanel() = default;
-    OutlinerPanel(const std::shared_ptr<HEngine::Scene>& scene);
+    OutlinerPanel(const Ref<HEngine::Scene>& scene);
 
-    void SetContext(const std::shared_ptr<HEngine::Scene>& scene);
+    void SetContext(const Ref<HEngine::Scene>& scene);
 
     void OnImGuiRender();
 private:
     void DrawEntityNode(HEngine::Entity entity);
     void DrawComponent(HEngine::Entity entity);
 private:
-    std::shared_ptr<HEngine::Scene> m_Scene;
+    Ref<HEngine::Scene> m_Scene;
     HEngine::Entity m_SelectionContext;
 };

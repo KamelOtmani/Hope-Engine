@@ -19,7 +19,7 @@ namespace HEngine {
 	static void BeginScene();
 	static void EndScene();
 	   
-	static void Submit(const std::shared_ptr<VertexArray>& vertexArray);
+	static void Submit(const Ref<VertexArray>& vertexArray);
 
 	inline static RHI::API GetAPI() { return RHI::GetAPI(); }
 	};

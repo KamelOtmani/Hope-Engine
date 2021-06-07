@@ -17,8 +17,9 @@ public:
 
     void OnEvent(HEngine::Event& event) override;
 private:
-    std::shared_ptr<HEngine::Scene> m_Scene;
+    Ref<HEngine::Scene> m_Scene;
     HEngine::Entity EditorCamera;
     HEngine::Entity m_SelectionContext;
     OutlinerPanel m_OutlinerPanel;
+    Ref<HEngine::Texture2D> defaultTexture;
 };

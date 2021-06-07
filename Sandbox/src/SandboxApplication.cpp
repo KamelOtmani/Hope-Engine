@@ -69,7 +69,7 @@ public:
 
     }
 
-    std::shared_ptr<HEngine::Scene> m_Scene;
+    Ref<HEngine::Scene> m_Scene;
 
 };
 

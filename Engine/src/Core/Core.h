@@ -1,6 +1,6 @@
 #pragma once
 
-#include "HTypes.h"
+#include <memory>
 
 #define HOPE_DYNAMIC_LINK 0
 
@@ -37,3 +37,19 @@
 #define BIT(x) (1 << x) 
 
 #define HBIND_EVENT(fn) std::bind(&fn, this, std::placeholders::_1)
+
+template<typename T>
+using Unique = std::unique_ptr<T>;
+template<typename T, typename ... Args>
+constexpr Unique<T> CreateScope(Args&& ... args)
+{
+    return std::make_unique<T>(std::forward<Args>(args)...);
+}
+
+template<typename T>
+using Ref = std::shared_ptr<T>;
+template<typename T, typename ... Args>
+constexpr Ref<T> CreateRef(Args&& ... args)
+{
+    return std::make_shared<T>(std::forward<Args>(args)...);
+}

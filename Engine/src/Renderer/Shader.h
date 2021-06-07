@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 #include <unordered_map>
+#include <HTypes.h>
 
 //#include <glad/glad.h>
 
@@ -23,7 +24,7 @@ namespace HEngine {
 		virtual void SetInt(const std::string& name, int value) ;
 		virtual void SetFloat3(const std::string& name, const Vec3& value);
 		virtual void SetFloat4(const std::string& name, const Vec4& value) ;
-		virtual void SetMat4(const std::string& name, const glm::mat4& value) ;
+		virtual void SetMat4(const std::string& name, const Mat4& value) ;
 
 		void UploadUniformInt(const std::string& name, int value);
 
@@ -33,7 +34,7 @@ namespace HEngine {
 		void UploadUniformFloat4(const std::string& name, const Vec4& value);
 
 		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix);
-		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
+		void UploadUniformMat4(const std::string& name, const Mat4& matrix);
 
 
 		std::string readFile(const std::string& filepath);

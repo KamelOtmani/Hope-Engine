@@ -11,11 +11,11 @@ namespace HEngine
     public:
         static void Init();
 
-        inline static std::shared_ptr<spdlog::logger>& GetEngineLogger() { return s_EngineLogger; }
-        inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
+        inline static Ref<spdlog::logger>& GetEngineLogger() { return s_EngineLogger; }
+        inline static Ref<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
     private:
-        static std::shared_ptr<spdlog::logger> s_EngineLogger;
-        static std::shared_ptr<spdlog::logger> s_ClientLogger;
+        static Ref<spdlog::logger> s_EngineLogger;
+        static Ref<spdlog::logger> s_ClientLogger;
     };
 
 }

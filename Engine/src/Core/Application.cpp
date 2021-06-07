@@ -42,7 +42,7 @@ namespace HEngine {
 		auto s4 = sizeof(verts);
 		auto s3 = verts.size();
 
-		std::shared_ptr<VertexBuffer> vertexBuffer;
+		Ref<VertexBuffer> vertexBuffer;
 		vertexBuffer.reset(VertexBuffer::Create(verts, verts.size()*(sizeof(Vec3)+ sizeof(Vec4))));
 		BufferLayout layout = {
 			{ ShaderDataType::Float3, "a_Position" },
@@ -52,7 +52,7 @@ namespace HEngine {
 		m_VertexArray->AddVertexBuffer(vertexBuffer);
 
 		uint32_t indices[3] = { 0, 1, 2 };
-		std::shared_ptr<IndexBuffer> indexBuffer;
+		Ref<IndexBuffer> indexBuffer;
 		indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 		auto d1 = sizeof(indices);

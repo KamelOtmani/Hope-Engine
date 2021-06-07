@@ -27,6 +27,7 @@
 #include "Renderer/Core/Buffer.h"
 #include "Renderer/Core/VertexArray.h"
 #include "Renderer/Shader.h"
+#include "Renderer/Texture.h"
 #include "Renderer/Commun.h"
 //----------------------------------------
 // STD Library

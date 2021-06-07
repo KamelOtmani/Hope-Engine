@@ -11,7 +11,7 @@ namespace HEngine {
         Material();
         ~Material();
 
-        std::shared_ptr<Shader> shader;
+        Ref<Shader> shader;
     };
 }
 

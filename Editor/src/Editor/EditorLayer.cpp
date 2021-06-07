@@ -28,6 +28,7 @@ void EditorLayer::OnAttach()
     auto main_Shader = new Shader("assets/shaders/simpleShader.glsl");
     testentt.GetComponent<MeshRendererComponent>().shader = main_Shader;
 
+    defaultTexture = HEngine::Texture2D::Create("assets/textures/test.jpg");
 }
 
 void EditorLayer::OnUpdate()
@@ -102,7 +103,10 @@ void EditorLayer::OnImGuiRender()
         }
         ImGui::End();
     }
-        m_OutlinerPanel.OnImGuiRender();
+    ImGui::Begin("Main Viewport");
+    ImGui::Image((void*)defaultTexture->getID(), ImVec2{ 920 ,1000.f * (9.f / 16.f) });
+    ImGui::End();
+    m_OutlinerPanel.OnImGuiRender();
 }
 
 void EditorLayer::OnEvent(HEngine::Event& event)

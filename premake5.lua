@@ -15,6 +15,7 @@ IncludeDir["Glad"] = "Engine/vendor/Glad/include"
 IncludeDir["ImGui"] = "Engine/vendor/imgui"
 IncludeDir["glm"] = "Engine/vendor/glm"
 IncludeDir["entt"] = "Engine/vendor/entt/include"
+IncludeDir["stb"] = "Engine/vendor/stb_image"
 
 	startproject "Editor"
 
@@ -48,6 +49,7 @@ project "Engine"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.stb}",
 		"%{IncludeDir.glm}"
 	}
 
