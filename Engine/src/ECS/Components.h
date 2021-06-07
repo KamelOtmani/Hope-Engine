@@ -35,7 +35,7 @@ namespace HEngine
             return glm::translate(glm::mat4(1.0f), Position) *
                 glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)) *
                 glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
-                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.z), glm::vec3(1.0f, 0.0f, 1.0f)) *
+                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)) *
                 glm::scale(glm::mat4(1.0f), Scale);
         }
 
@@ -43,7 +43,7 @@ namespace HEngine
             return glm::translate(glm::mat4(1.0f), Position) *
                 glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)) *
                 glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
-                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.z), glm::vec3(1.0f, 0.0f, 1.0f)) *
+                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)) *
                 glm::scale(glm::mat4(1.0f), Scale);
         }
         operator const Mat4& () const
@@ -51,7 +51,7 @@ namespace HEngine
             return glm::translate(glm::mat4(1.0f), Position) *
                 glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)) *
                 glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
-                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.z), glm::vec3(1.0f, 0.0f, 1.0f)) *
+                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)) *
                 glm::scale(glm::mat4(1.0f), Scale);
         }
     };
@@ -86,21 +86,48 @@ namespace HEngine
         std::vector<uint32_t> _indices;
     };
 
+    enum class CameraProjectionType { Perspective = 0, Orthographic = 1 };
+
     struct CameraComponent
     {
         CameraComponent() = default;
 
+        CameraProjectionType projType = CameraProjectionType::Perspective;
     	float fov = 90.f;
     	float nearPlane = 0.1f;
-    	float farPlane = 10.0f;
+    	float farPlane = 1000.0f;
     	float hight = 1600.0f;
     	float width = 900.0f;
     	float aspectRatio = 16.0f / 9.0f;
+
+        float orthographicSize = 10.f;
+        float orthographicNearPlane = -1.0f;
+        float orthographicFarPlane = 1.0f;
+
         bool bPrimary = false;
 
     	Mat4 Projection()
     	{
-    		return glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
+            switch (projType)
+            {
+            case HEngine::CameraProjectionType::Perspective:
+                return glm::perspective(glm::radians(fov), aspectRatio, nearPlane, farPlane);
+                break;
+            case HEngine::CameraProjectionType::Orthographic:
+            {
+                float orthoLeft = -orthographicSize * aspectRatio * 0.5f;
+                float orthoRight = orthographicSize * aspectRatio * 0.5f;
+                float orthoBottom = -orthographicSize * 0.5f;
+                float orthoTop = orthographicSize * 0.5f;
+                return glm::ortho(orthoLeft, orthoRight,
+                    orthoBottom, orthoTop, orthographicNearPlane, orthographicFarPlane);
+                break;
+            }
+            default:
+                HASSERT(false,"SOMETHING WENT WRONG WHEN SETTING CAMERA PROJECTION ! (LINE 125 Component.h)");
+                return Mat4(1.0f);
+                break;
+            }
     		//return glm::ortho(0.0f, hight, 0.0f, width, nearPlane, farPlane);
     	}
     };

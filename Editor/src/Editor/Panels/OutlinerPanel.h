@@ -15,7 +15,7 @@ public:
     void OnImGuiRender();
 private:
     void DrawEntityNode(HEngine::Entity entity);
-    void DrawComponent(HEngine::Entity entity);
+    void DrawComponents(HEngine::Entity entity);
 private:
     Ref<HEngine::Scene> m_Scene;
     HEngine::Entity m_SelectionContext;

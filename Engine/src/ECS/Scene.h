@@ -14,7 +14,8 @@ namespace HEngine {
 
         void setupScene();
 
-        Entity CreateEntity(const std::string& name = std::string() );
+        Entity CreateEntity(const std::string& name = std::string());
+        void DestroyEntity(Entity entity);
     
         entt::registry m_Registry;
     private:

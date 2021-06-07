@@ -29,4 +29,9 @@ namespace HEngine
         return entt;
     }
 
+    void Scene::DestroyEntity(Entity entity )
+    {
+        m_Registry.destroy(entity);
+    }
+
 }

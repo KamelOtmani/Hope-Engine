@@ -26,7 +26,7 @@ namespace HEngine {
         }
 
         template<typename T>
-        T& RemoveComponent()
+        void RemoveComponent()
         {
             //HASSERT(!HasComponent<T>(), "Entity already has component!");
             return scene->m_Registry.remove<T>(m_id);
@@ -39,7 +39,8 @@ namespace HEngine {
             return scene->m_Registry.emplace<T>(m_id, std::forward<Args>(args)...);
         }
 		
-		operator uint32_t() const { return (uint32_t)m_id; }
+        operator uint32_t() const { return (uint32_t)m_id; }
+        operator entt::entity() const { return m_id; }
 
         operator bool() const { return m_id != entt::null; }
 
