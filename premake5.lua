@@ -16,7 +16,7 @@ IncludeDir["ImGui"] = "Engine/vendor/imgui"
 IncludeDir["glm"] = "Engine/vendor/glm"
 IncludeDir["entt"] = "Engine/vendor/entt/include"
 
-	startproject "Sandbox"
+	startproject "Editor"
 
 
 project "Engine"
@@ -85,8 +85,9 @@ project "Engine"
 		optimize "On"
 
 	
-project "Sandbox"
-	location "Sandbox"
+project "Editor"
+
+	location "Editor"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
@@ -132,6 +133,57 @@ project "Sandbox"
 		defines "HOPE_RELEASE"
 		runtime "Release"
 		optimize "On"
+
+	
+project "Sandbox"
+
+		location "Sandbox"
+		kind "ConsoleApp"
+		language "C++"
+		cppdialect "C++17"
+		staticruntime "On"
+	
+		targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+		objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+	
+		files
+		{
+			"%{prj.name}/src/**.h",
+			"%{prj.name}/src/**.cpp"
+		}
+	
+		includedirs
+		{
+			"Engine/vendor/spdlog/include",
+			"Engine/src",
+			"%{IncludeDir.ImGui}",
+			"%{IncludeDir.glm}",
+			"%{IncludeDir.entt}"
+		}
+	
+		links
+		{
+			"Engine"
+		}
+	
+		filter "system:windows"
+			systemversion "latest"
+	
+			defines
+			{
+				"HOPE_PLATFORM_WINDOWS"
+			}
+	
+		filter "configurations:Debug"
+			defines "HOPE_DEBUG"
+			runtime "Debug"
+			symbols "On"
+	
+		filter "configurations:Release"
+			defines "HOPE_RELEASE"
+			runtime "Release"
+			optimize "On"
+	
 
 group "ThirdParty"
 	

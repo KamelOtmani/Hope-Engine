@@ -133,7 +133,6 @@
     <ClInclude Include="src\Renderer\Mesh.h" />
     <ClInclude Include="src\Renderer\RHI\RHI.h" />
     <ClInclude Include="src\Renderer\RHI\RHICommand.h" />
-    <ClInclude Include="src\Renderer\SCENE.H" />
     <ClInclude Include="src\Renderer\Shader.h" />
   </ItemGroup>
   <ItemGroup>

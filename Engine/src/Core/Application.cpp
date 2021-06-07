@@ -125,7 +125,13 @@ namespace HEngine {
 			m_Window->OnUpdate();
 		}
 	}
-	void Application::OnEvent(Event& e)
+
+    void Application::Close()
+    {
+		m_Running = false;
+    }
+
+    void Application::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(std::bind(&Application::OnWindowClose, this, std::placeholders::_1));
