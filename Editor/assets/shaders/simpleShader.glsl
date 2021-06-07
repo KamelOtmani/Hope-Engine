@@ -27,5 +27,5 @@ in vec4 v_Color;
 
 void main()
 {
-	color = 1-v_Color;
+	color = v_Color;
 }

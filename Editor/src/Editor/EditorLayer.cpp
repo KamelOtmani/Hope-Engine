@@ -13,15 +13,16 @@ void EditorLayer::OnAttach()
     auto testentt = m_Scene->CreateEntity("Test Quad");
     std::vector<FVertex> verts = {
         {Vec3{ -0.5f, -0.5f, 0.0f }, Vec4{ 0.1f, 0.1f,0.8f,1.0f }},
-        { Vec3{0.5f, -0.5f, 0.0f}, Vec4{0.1f, 0.1f,0.8f,1.0f} },
-        { Vec3{0.5f, 0.5f, 0.0f} , Vec4{0.1f, 0.1f,0.8f,1.0f} },
-        { Vec3{-0.5f, 0.5f, 0.0f}, Vec4{0.1f, 0.1f,0.8f,1.0f} },
+        { Vec3{0.5f, -0.5f, 0.0f},   Vec4{0.8f, 0.1f,0.8f,1.0f} },
+        { Vec3{0.5f, 0.5f, 0.0f} ,   Vec4{0.8f, 0.1f,0.8f,1.0f} },
+        { Vec3{-0.5f, 0.5f, 0.0f},   Vec4{0.8f, 0.1f,0.8f,1.0f} },
     };
     std::vector<uint32_t> indx = { 0, 1, 2, 2, 3, 0 };
     testentt.AddComponent<MeshRendererComponent>(verts, indx);
 
     EditorCamera = m_Scene->CreateEntity("Editor Camera");
     EditorCamera.AddComponent<CameraComponent>();
+    EditorCamera.GetComponent<TransformComponent>().Position = Vec3{ 0.0f,0.0f,3.0f };
     EditorCamera.GetComponent<CameraComponent>().bPrimary = true;
     m_OutlinerPanel.SetContext(m_Scene);
 
@@ -29,12 +30,20 @@ void EditorLayer::OnAttach()
     testentt.GetComponent<MeshRendererComponent>().shader = main_Shader;
 
     defaultTexture = HEngine::Texture2D::Create("assets/textures/test.jpg");
+
+    HEngine::FramebufferSpecification fbspec;
+    fbspec.width = 1600;
+    fbspec.height = 900;
+
+    m_MainFramebuffer = HEngine::Framebuffer::Create(fbspec);
 }
 
 void EditorLayer::OnUpdate()
 {
+    m_MainFramebuffer->Bind();
     HEngine::Renderer::prepareScene(m_Scene.get());
     HEngine::Renderer::submitScene(m_Scene.get());
+    m_MainFramebuffer->UnBind();
 }
 void EditorLayer::OnImGuiRender()
 {
@@ -103,9 +112,25 @@ void EditorLayer::OnImGuiRender()
         }
         ImGui::End();
     }
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
     ImGui::Begin("Main Viewport");
-    ImGui::Image((void*)defaultTexture->getID(), ImVec2{ 920 ,1000.f * (9.f / 16.f) });
+    m_ViewportFocused = ImGui::IsWindowFocused();
+    m_ViewportHovered = ImGui::IsWindowHovered();
+    Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
+
+    auto ViewportPanelSize = ImGui::GetContentRegionAvail();
+    if ((m_ViewportHeight != ViewportPanelSize.y) | (m_ViewportWidth != ViewportPanelSize.x))
+    {
+        m_ViewportHeight = ViewportPanelSize.y;
+        m_ViewportWidth = ViewportPanelSize.x;
+        m_MainFramebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+        EditorCamera.GetComponent<CameraComponent>().aspectRatio = (float)m_ViewportWidth / (float)m_ViewportHeight;
+    }
+    auto textID = m_MainFramebuffer->getColorAttachement();
+    ImGui::Image((void*)textID, ViewportPanelSize, ImVec2{ 0,1 }, ImVec2{ 1,0 });
     ImGui::End();
+    ImGui::PopStyleVar();
     m_OutlinerPanel.OnImGuiRender();
 }
 

@@ -118,17 +118,18 @@
     <ClInclude Include="src\Layers\LayerStack.h" />
     <ClInclude Include="src\PCH\hpch.h" />
     <ClInclude Include="src\Platform\OpenGl\Renderer\GLContext.h" />
+    <ClInclude Include="src\Platform\OpenGl\Renderer\GLFramebuffer.h" />
     <ClInclude Include="src\Platform\OpenGl\Renderer\GLTexture.h" />
     <ClInclude Include="src\Platform\OpenGl\Renderer\GLVertexArray.h" />
     <ClInclude Include="src\Platform\OpenGl\Renderer\GlBuffer.h" />
     <ClInclude Include="src\Platform\OpenGl\Renderer\OpenGLRenderer.h" />
-    <ClInclude Include="src\Platform\Windows\WinInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\Renderer\Commun.h" />
     <ClInclude Include="src\Renderer\Core\Buffer.h" />
     <ClInclude Include="src\Renderer\Core\Renderer.h" />
     <ClInclude Include="src\Renderer\Core\VertexArray.h" />
     <ClInclude Include="src\Renderer\EditorCamera.h" />
+    <ClInclude Include="src\Renderer\Framebuffer.h" />
     <ClInclude Include="src\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Renderer\Material.h" />
     <ClInclude Include="src\Renderer\Mesh.h" />
@@ -150,6 +151,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGl\Renderer\GLContext.cpp" />
+    <ClCompile Include="src\Platform\OpenGl\Renderer\GLFramebuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGl\Renderer\GLTexture.cpp" />
     <ClCompile Include="src\Platform\OpenGl\Renderer\GLVertexArray.cpp" />
     <ClCompile Include="src\Platform\OpenGl\Renderer\GlBuffer.cpp" />
@@ -159,6 +161,7 @@
     <ClCompile Include="src\Renderer\Core\Buffer.cpp" />
     <ClCompile Include="src\Renderer\Core\Renderer.cpp" />
     <ClCompile Include="src\Renderer\Core\VertexArray.cpp" />
+    <ClCompile Include="src\Renderer\Framebuffer.cpp" />
     <ClCompile Include="src\Renderer\Material.cpp" />
     <ClCompile Include="src\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Renderer\RHI\RHI.cpp" />

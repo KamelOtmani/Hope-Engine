@@ -29,6 +29,7 @@
 #include "Renderer/Shader.h"
 #include "Renderer/Texture.h"
 #include "Renderer/Commun.h"
+#include "Renderer/Framebuffer.h"
 //----------------------------------------
 // STD Library
 //----------------------------------------

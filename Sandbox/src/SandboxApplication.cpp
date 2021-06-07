@@ -1,5 +1,7 @@
 #include <HEngine.h>
 #include <imgui.h>
+#include <Core/EntryPoint.h>
+
 
 
 using namespace HEngine;
@@ -58,8 +60,6 @@ public:
                 ImGui::TreePop();
             }
         }
-
-
         ImGui::End();
         
     }
