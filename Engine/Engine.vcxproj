@@ -58,7 +58,7 @@
       <PrecompiledHeaderFile>hpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HOPE_PLATFORM_WINDOWS;HOPE_BUILD_DLL;GLFW_INCLUDE_NONE;HOPE_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;src\PCH;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;src\PCH;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\entt\include;vendor\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -78,7 +78,7 @@
       <PrecompiledHeaderFile>hpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HOPE_PLATFORM_WINDOWS;HOPE_BUILD_DLL;GLFW_INCLUDE_NONE;HOPE_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;src\PCH;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;src\PCH;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\entt\include;vendor\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -97,15 +97,15 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\ECS\Entity.h" />
-    <ClInclude Include="src\Renderer\Commun.h" />
-    <ClInclude Include="src\Renderer\Scene.h" />
     <ClInclude Include="src\Core\Application.h" />
     <ClInclude Include="src\Core\Core.h" />
     <ClInclude Include="src\Core\EntryPoint.h" />
     <ClInclude Include="src\Core\Input.h" />
     <ClInclude Include="src\Core\Log.h" />
     <ClInclude Include="src\Core\Window.h" />
+    <ClInclude Include="src\ECS\Components.h" />
+    <ClInclude Include="src\ECS\Entity.h" />
+    <ClInclude Include="src\ECS\Scene.h" />
     <ClInclude Include="src\Events\AppEvent.h" />
     <ClInclude Include="src\Events\Event.h" />
     <ClInclude Include="src\Events\KeyCodes.h" />
@@ -123,19 +123,24 @@
     <ClInclude Include="src\Platform\OpenGl\Renderer\OpenGLRenderer.h" />
     <ClInclude Include="src\Platform\Windows\WinInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
+    <ClInclude Include="src\Renderer\Commun.h" />
     <ClInclude Include="src\Renderer\Core\Buffer.h" />
     <ClInclude Include="src\Renderer\Core\Renderer.h" />
     <ClInclude Include="src\Renderer\Core\VertexArray.h" />
+    <ClInclude Include="src\Renderer\EditorCamera.h" />
     <ClInclude Include="src\Renderer\GraphicsContext.h" />
+    <ClInclude Include="src\Renderer\Material.h" />
+    <ClInclude Include="src\Renderer\Mesh.h" />
     <ClInclude Include="src\Renderer\RHI\RHI.h" />
     <ClInclude Include="src\Renderer\RHI\RHICommand.h" />
+    <ClInclude Include="src\Renderer\SCENE.H" />
     <ClInclude Include="src\Renderer\Shader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ECS\Entity.cpp" />
-    <ClCompile Include="src\Renderer\Scene.cpp" />
     <ClCompile Include="src\Core\Application.cpp" />
     <ClCompile Include="src\Core\Log.cpp" />
+    <ClCompile Include="src\ECS\Entity.cpp" />
+    <ClCompile Include="src\ECS\Scene.cpp" />
     <ClCompile Include="src\Layers\ImGuiBuild.cpp" />
     <ClCompile Include="src\Layers\ImGuiLayer.cpp" />
     <ClCompile Include="src\Layers\Layer.cpp" />
@@ -152,6 +157,8 @@
     <ClCompile Include="src\Renderer\Core\Buffer.cpp" />
     <ClCompile Include="src\Renderer\Core\Renderer.cpp" />
     <ClCompile Include="src\Renderer\Core\VertexArray.cpp" />
+    <ClCompile Include="src\Renderer\Material.cpp" />
+    <ClCompile Include="src\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Renderer\RHI\RHI.cpp" />
     <ClCompile Include="src\Renderer\RHI\RHICommand.cpp" />
     <ClCompile Include="src\Renderer\Shader.cpp" />

@@ -3,6 +3,7 @@
 #include "ECS/Entity.h"
 #include "Renderer/Shader.h"
 #include "Renderer/Material.h"
+#include <ECS\Components.h>
 
 namespace HEngine {
 	void Renderer::Initialise()
@@ -16,24 +17,30 @@ namespace HEngine {
 	}
 	void Renderer::submitScene(Scene* scene)
 	{
-		auto cam = scene->CameraList[0];
-		if (cam)
+		Mat4 ViewProjectionMatrix = Mat4(1.0f);
+		auto view = scene->m_Registry.view<CameraComponent,TransformComponent>();
+		for (auto entity : view)
 		{
-			for (auto& mesh : scene->entityList)
+			auto [cam, transform] = view.get<CameraComponent,TransformComponent>(entity);
+			if (cam.bPrimary)
 			{
-				if (mesh.shouldUpdate())
-					mesh.updateMesh();
-				if (mesh.mat.shader)
-				{
-					mesh.mat.shader->Bind();
-					mesh.mat.shader->SetMat4("u_Transform", mesh.transform.ModelMatrix());
-					//HLOG("Camera position = {0},{1},{2}", cam->transform.Position.x, cam->transform.Position.y, cam->transform.Position.z);
-					mesh.mat.shader->SetMat4("u_ViewProjection", cam->ViewProjectionMatrix());
-				}
-				mesh.getVertexArray()->Bind();
-				RHICommand::DrawIndexed(mesh.getVertexArray());
-
+				ViewProjectionMatrix = cam.Projection() * glm::inverse(transform.Matrix());
+				break;
 			}
+		}
+		auto group = scene->m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
+		for (auto entity : group)
+		{
+			auto [xform, mesh] = group.get<TransformComponent, MeshRendererComponent>(entity);
+			if (mesh.shader != nullptr)
+			{
+				mesh.shader->Bind();
+				mesh.shader->SetMat4("u_Transform", xform.Matrix());
+				mesh.shader->SetMat4("u_ViewProjection",ViewProjectionMatrix);
+			}
+			mesh.vertexArray->Bind();
+			RHICommand::DrawIndexed(mesh.vertexArray);
+
 		}
 		//HLOG("Submiting scene");
 	}

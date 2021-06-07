@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Renderer/RHI/RHICommand.h"
-#include "Renderer\Scene.h"
+#include "ECS/Scene.h"
 
 namespace HEngine {
 

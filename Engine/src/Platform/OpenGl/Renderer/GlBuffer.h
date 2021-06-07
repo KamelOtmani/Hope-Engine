@@ -8,7 +8,7 @@ namespace HEngine {
 	{
 	public:
 		GLVertexBuffer(float* vertices, uint32_t size);
-		GLVertexBuffer(std::vector<FVertex>& vertices, uint32_t size);
+		GLVertexBuffer(const std::vector<FVertex>& vertices, uint32_t size);
 		virtual ~GLVertexBuffer();
 
 		virtual void Bind() const override;

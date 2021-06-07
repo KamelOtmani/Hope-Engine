@@ -15,6 +15,7 @@
 #include <unordered_set>
 
 #include "Core/Log.h"
+#include "Core/Core.h"
 
 #if HOPE_PLATFORM_WINDOWS
 #include <Windows.h>

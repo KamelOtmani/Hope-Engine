@@ -1,7 +1,6 @@
 #include "hpch.h"
 #include "Buffer.h"
 
-
 #include "Renderer.h"
 
 #include "Platform/OpenGL/Renderer/GLBuffer.h"
@@ -20,7 +19,7 @@ namespace HEngine {
 		return nullptr;
 	}
 
-	VertexBuffer* VertexBuffer::Create(std::vector<FVertex>& vertices, uint32_t size)
+	VertexBuffer* VertexBuffer::Create(const std::vector<FVertex>& vertices, uint32_t size)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -43,5 +42,4 @@ namespace HEngine {
 		HENGINE_ASSERT(false, "Unknown RHI!");
 		return nullptr;
 	}
-
 }
