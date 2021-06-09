@@ -28,14 +28,14 @@ namespace HEngine {
         template<typename T>
         void RemoveComponent()
         {
-            //HASSERT(!HasComponent<T>(), "Entity already has component!");
+            HASSERT(!HasComponent<T>(), "Entity already has component!");
             return scene->m_Registry.remove<T>(m_id);
         }
 
         template<typename T, typename... Args>
         T& AddComponent(Args&&... args)
         {
-            //HASSERT(!HasComponent<T>(), "Enttity does not have this component");
+            HASSERT(!HasComponent<T>(), "Enttity already have this component");
             return scene->m_Registry.emplace<T>(m_id, std::forward<Args>(args)...);
         }
 		

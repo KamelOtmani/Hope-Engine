@@ -86,6 +86,19 @@ namespace HEngine
         std::vector<uint32_t> _indices;
     };
 
+    struct SpriteRendererComponent
+    {
+        Vec4 m_Color = Vec4{ 1.0f };
+        Shader* m_Shader = nullptr;
+
+        SpriteRendererComponent() = default;
+        SpriteRendererComponent(const SpriteRendererComponent& other) = default;
+        SpriteRendererComponent(const Vec4& Color)
+            : m_Color(Color) {}
+        ~SpriteRendererComponent() = default;
+
+    };
+
     enum class CameraProjectionType { Perspective = 0, Orthographic = 1 };
 
     struct CameraComponent
@@ -96,8 +109,6 @@ namespace HEngine
     	float fov = 90.f;
     	float nearPlane = 0.1f;
     	float farPlane = 1000.0f;
-    	float hight = 1600.0f;
-    	float width = 900.0f;
     	float aspectRatio = 16.0f / 9.0f;
 
         float orthographicSize = 10.f;

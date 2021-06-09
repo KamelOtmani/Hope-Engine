@@ -1,0 +1,367 @@
+workspace "Hope Engine"
+	architecture "x64"
+
+	configurations
+	{
+		"Debug",
+		"Release"
+	}
+
+outputdir = "%{cfg.buildcfg}-%{cfg.architecture}"
+
+IncludeDir = {}
+IncludeDir["GLFW"] = "Engine/vendor/GLFW/include"
+IncludeDir["Glad"] = "Engine/vendor/Glad/include"
+IncludeDir["ImGui"] = "Engine/vendor/imgui"
+IncludeDir["glm"] = "Engine/vendor/glm"
+IncludeDir["entt"] = "Engine/vendor/entt/include"
+IncludeDir["stb"] = "Engine/vendor/stb_image"
+IncludeDir["yaml"] = "Engine/vendor/yaml-cpp/include/yaml-cpp"
+
+	startproject "Editor"
+
+
+project "Engine"
+	location "Engine"
+	kind "StaticLib"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "On"
+
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	pchheader "hpch.h"
+	pchsource "%{prj.name}/src/PCH/hpch.cpp"
+
+	files
+	{
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
+	}
+
+	includedirs
+	{
+		"%{prj.name}/vendor/spdlog/include",
+		"%{prj.name}/src/",
+		"%{prj.name}/src/PCH",	
+		"%{prj.name}/vendor/spdlog/include",
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}",
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.stb}",
+		"%{IncludeDir.yaml}",
+		"%{IncludeDir.glm}"
+	}
+
+	links 
+	{ 
+		"GLFW",
+		"Glad",
+		"ImGui",
+		"YAML",
+		"opengl32.lib"
+	}
+	defines 
+	{
+		"_CRT_SECURE_NO_WARNINGS"
+	}
+
+	filter "system:windows"
+		systemversion "latest"
+
+		defines
+		{
+			"HOPE_PLATFORM_WINDOWS",
+			"HOPE_BUILD_DLL",
+			"GLFW_INCLUDE_NONE"
+		}
+
+
+	filter "configurations:Debug"
+		defines "HOPE_DEBUG"
+		runtime "Debug"
+		symbols "On"
+
+	filter "configurations:Release"
+		defines "HOPE_RELEASE"
+		runtime "Release"
+		optimize "On"
+
+	
+project "Editor"
+	location "Editor"
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "On"
+
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	files
+	{
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
+	}
+
+	includedirs
+	{
+		"Engine/vendor/spdlog/include",
+		"Engine/src",
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
+	}
+
+	links
+	{
+		"Engine"
+	}
+
+	filter "system:windows"
+		systemversion "latest"
+
+		defines
+		{
+			"HOPE_PLATFORM_WINDOWS"
+		}
+
+	filter "configurations:Debug"
+		defines "HOPE_DEBUG"
+		runtime "Debug"
+		symbols "On"
+
+	filter "configurations:Release"
+		defines "HOPE_RELEASE"
+		runtime "Release"
+		optimize "On"
+
+	
+project "Sandbox"
+	location "Sandbox"
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "On"
+
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	files
+	{
+		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.cpp"
+	}
+
+	includedirs
+	{
+		"Engine/vendor/spdlog/include",
+		"Engine/src",
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
+	}
+
+	links
+	{
+		"Engine"
+	}
+
+	filter "system:windows"
+		systemversion "latest"
+
+		defines
+		{
+			"HOPE_PLATFORM_WINDOWS"
+		}
+
+	filter "configurations:Debug"
+		defines "HOPE_DEBUG"
+		runtime "Debug"
+		symbols "On"
+
+	filter "configurations:Release"
+		defines "HOPE_RELEASE"
+		runtime "Release"
+		optimize "On"
+	
+
+group "ThirdParty"
+	
+	project "GLFW"
+		location "Engine/vendor/GLFW"
+		kind "StaticLib"
+		language "C"
+		staticruntime "On"
+
+		targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+		objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+		files
+		{
+			"Engine/vendor/GLFW/include/GLFW/glfw3.h",
+			"Engine/vendor/GLFW/include/GLFW/glfw3native.h",
+			"Engine/vendor/GLFW/src/glfw_config.h",
+			"Engine/vendor/GLFW/src/context.c",
+			"Engine/vendor/GLFW/src/init.c",
+			"Engine/vendor/GLFW/src/input.c",
+			"Engine/vendor/GLFW/src/monitor.c",
+			"Engine/vendor/GLFW/src/vulkan.c",
+			"Engine/vendor/GLFW/src/window.c"
+		}
+		filter "system:linux"
+			pic "On"
+
+			systemversion "latest"
+
+			files
+			{
+				"src/x11_init.c",
+				"src/x11_monitor.c",
+				"src/x11_window.c",
+				"src/xkb_unicode.c",
+				"src/posix_time.c",
+				"src/posix_thread.c",
+				"src/glx_context.c",
+				"src/egl_context.c",
+				"src/osmesa_context.c",
+				"src/linux_joystick.c"
+			}
+
+			defines
+			{
+				--"_GLFW_X11"
+			}
+
+		filter "system:windows"
+			systemversion "latest"
+
+			files
+			{
+				"Engine/vendor/GLFW/src/win32_init.c",
+				"Engine/vendor/GLFW/src/win32_joystick.c",
+				"Engine/vendor/GLFW/src/win32_monitor.c",
+				"Engine/vendor/GLFW/src/win32_time.c",
+				"Engine/vendor/GLFW/src/win32_thread.c",
+				"Engine/vendor/GLFW/src/win32_window.c",
+				"Engine/vendor/GLFW/src/wgl_context.c",
+				"Engine/vendor/GLFW/src/egl_context.c",
+				"Engine/vendor/GLFW/src/osmesa_context.c"
+			}
+
+			defines 
+			{ 
+				"_GLFW_WIN32",
+				"_CRT_SECURE_NO_WARNINGS"
+			}
+
+		filter "configurations:Debug"
+			runtime "Debug"
+			symbols "on"
+
+		filter "configurations:Release"
+			runtime "Release"
+			optimize "on"
+
+	project "Glad"
+		location "Engine/vendor/Glad"
+		kind "StaticLib"
+		language "C"
+		staticruntime "On"
+
+		targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+		objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+		files
+		{
+			"Engine/vendor/Glad/include/glad/glad.h",
+			"Engine/vendor/Glad/include/KHR/khrplatform.h",
+			"Engine/vendor/Glad/src/glad.c"
+		}
+
+		includedirs
+		{
+			"Engine/vendor/Glad/include"
+		}
+
+		filter "system:windows"
+			systemversion "latest"
+
+			filter "configurations:Debug"
+			runtime "Debug"
+			symbols "on"
+
+		filter "configurations:Release"
+			runtime "Release"
+			optimize "on"
+			
+	project "ImGui"
+		location "Engine/vendor/imgui"
+		kind "StaticLib"
+		language "C++"
+		cppdialect "C++17"
+		staticruntime "On"
+		
+		targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+		objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+		files
+		{
+			"Engine/vendor/imgui/imconfig.h",
+			"Engine/vendor/imgui/imgui.h",
+			"Engine/vendor/imgui/imgui.cpp",
+			"Engine/vendor/imgui/imgui_draw.cpp",
+			"Engine/vendor/imgui/imgui_internal.h",
+			"Engine/vendor/imgui/imgui_widgets.cpp",
+			"Engine/vendor/imgui/imstb_rectpack.h",
+			"Engine/vendor/imgui/imstb_textedit.h",
+			"Engine/vendor/imgui/imstb_truetype.h",
+			"Engine/vendor/imgui/imgui_demo.cpp"
+		}
+		
+		filter "system:windows"
+			systemversion "latest"
+			
+		
+			filter "configurations:Debug"
+			runtime "Debug"
+			symbols "on"
+
+		filter "configurations:Release"
+			runtime "Release"
+			optimize "on"
+
+	project "YAML"
+		location "Engine/vendor/yaml-cpp"
+		kind "StaticLib"
+		language "C++"
+		cppdialect "C++17"
+		staticruntime "On"
+		
+		targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+		objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+		files
+		{
+			"Engine/vendor/yaml-cpp/src/**.h",
+			"Engine/vendor/yaml-cpp/src/**.cpp",
+			
+			"Engine/vendor/yaml-cpp/include/**.h"
+		}
+		
+		filter "system:windows"
+			systemversion "latest"
+			
+		
+			filter "configurations:Debug"
+			runtime "Debug"
+			symbols "on"
+
+		filter "configurations:Release"
+			runtime "Release"
+			optimize "on"
+
+			
+group ""

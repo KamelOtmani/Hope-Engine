@@ -17,6 +17,14 @@ public:
     void OnImGuiRender() override;
 
     void OnEvent(HEngine::Event& event) override;
+
+private:
+    bool OnKeyPressed(HEngine::KeyPressedEvent& e);
+
+    void NewScene();
+    void OpenScene();
+    void SaveSceneAs();
+
 private:
     Ref<HEngine::Scene> m_Scene;
     HEngine::Entity EditorCamera;
@@ -30,6 +38,7 @@ private:
     OutlinerPanel m_OutlinerPanel;
     uint32_t m_ViewportHeight, m_ViewportWidth;
     bool m_ViewportFocused = false, m_ViewportHovered = false;
+    int m_GizmoType = -1;
 
     // Default resources
     Ref<HEngine::Texture2D> defaultTexture;

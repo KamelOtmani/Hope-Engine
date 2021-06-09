@@ -8,6 +8,7 @@
 namespace HEngine {
 	void Renderer::Initialise()
 	{
+
 	}
 	void Renderer::prepareScene(Scene* scene)
 	{
@@ -42,6 +43,30 @@ namespace HEngine {
 			RHICommand::DrawIndexed(mesh.vertexArray);
 
 		}
+
+        auto group2 = scene->m_Registry.view<TransformComponent,SpriteRendererComponent>();
+        for (auto entity : group2)
+        {
+            auto [xform, sprite] = group2.get<TransformComponent, SpriteRendererComponent>(entity);
+            if (sprite.m_Shader)
+            {
+				sprite.m_Shader->Bind();
+                sprite.m_Shader->SetFloat4("u_Color", sprite.m_Color);
+                sprite.m_Shader->SetMat4("u_Transform", xform.Matrix());
+				sprite.m_Shader->SetMat4("u_ViewProjection", ViewProjectionMatrix);
+            }
+			else if (scene->m_DefaultShader)
+			{
+                scene->m_DefaultShader->Bind();
+                scene->m_DefaultShader->SetFloat4("u_Color", sprite.m_Color);
+                scene->m_DefaultShader->SetMat4("u_Transform", xform.Matrix());
+                scene->m_DefaultShader->SetMat4("u_ViewProjection", ViewProjectionMatrix);
+			}
+			scene->m_QuadVAO->Bind();
+            RHICommand::DrawIndexed(scene->m_QuadVAO);
+
+        }
+		
 		//HLOG("Submiting scene");
 	}
 	void Renderer::BeginScene()

@@ -17,6 +17,12 @@ OutlinerPanel::OutlinerPanel(const Ref<Scene>& context)
 void OutlinerPanel::SetContext(const Ref<Scene>& context)
 {
     m_Scene = context;
+    m_SelectionContext = {};
+}
+
+HEngine::Entity OutlinerPanel::GetSelectedEntity() const
+{
+     return m_SelectionContext; 
 }
 
 void OutlinerPanel::OnImGuiRender()
@@ -29,7 +35,14 @@ void OutlinerPanel::OnImGuiRender()
         Entity entt{ entity, m_Scene.get() };
         DrawEntityNode(entt);
     }
+    // Right-click on blank space
+    if (ImGui::BeginPopupContextWindow(0, 1, false))
+    {
+        if (ImGui::MenuItem("Create Empty Entity"))
+            m_Scene->CreateEntity("Empty Entity");
 
+        ImGui::EndPopup();
+    }
 
     ImGui::End();
 
@@ -159,7 +172,7 @@ void OutlinerPanel::DrawComponents(HEngine::Entity entity)
         char buffer[256];
         memset(buffer, 0, sizeof(buffer));
         strcpy_s(buffer, sizeof(buffer), tag.c_str());
-        if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
+        if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
         {
             tag = std::string(buffer);
         }
@@ -168,16 +181,31 @@ void OutlinerPanel::DrawComponents(HEngine::Entity entity)
     ImGui::SameLine();
     ImGui::PushItemWidth(-1);
 
-    if (ImGui::Button("Add Component"))
+    if (ImGui::Button("Add Component", ImVec2{ -1.0,25.f }))
         ImGui::OpenPopup("AddComponent");
 
     if (ImGui::BeginPopup("AddComponent"))
     {
-        if (ImGui::MenuItem("Camera Component"))
+        if (!m_SelectionContext.HasComponent<CameraComponent>())
         {
-            m_SelectionContext.AddComponent<CameraComponent>();
-            ImGui::CloseCurrentPopup();
+            if (ImGui::MenuItem("Camera Component"))
+            {
+                m_SelectionContext.AddComponent<CameraComponent>();
+                ImGui::CloseCurrentPopup();
+            }
         }
+        
+        if (!m_SelectionContext.HasComponent<SpriteRendererComponent>())
+        {
+            if (ImGui::MenuItem("Sprite Component"))
+            {
+
+                m_SelectionContext.AddComponent<SpriteRendererComponent>();
+                ImGui::CloseCurrentPopup();
+            }
+
+        }
+        
 
         ImGui::EndPopup();
     }
@@ -224,7 +252,7 @@ void OutlinerPanel::DrawComponents(HEngine::Entity entity)
         ImGui::PopStyleVar();
         });
 
-    DrawComponent<CameraComponent>("Transform", entity, [](auto& component)
+    DrawComponent<CameraComponent>("Camera Component", entity, [](auto& component)
         {
             auto& cam = component;
 
@@ -260,6 +288,12 @@ void OutlinerPanel::DrawComponents(HEngine::Entity entity)
                 ImGui::DragFloat("Far Plane", &cam.orthographicFarPlane, 1.0f, 0.0f, 10000.f);
             }
             ImGui::Checkbox("Primary Camera", &cam.bPrimary);
+        });
+
+    DrawComponent<SpriteRendererComponent>("Sprite Renderer Component", entity, [](auto& component)
+        {
+            auto& sprite = component;
+            ImGui::ColorEdit4("Color", glm::value_ptr(sprite.m_Color));
         });
 
 

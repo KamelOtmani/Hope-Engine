@@ -13,3 +13,12 @@
 [submodule "Engine/vendor/glm"]
 	path = Engine/vendor/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "Engine/vendir"]
+	path = Engine/vendir
+	url = https://github.com/TheJoKeR15/yaml-cpp.git
+[submodule "Engine/vendor/yaml-cpp"]
+	path = Engine/vendor/yaml-cpp
+	url = https://github.com/TheJoKeR15/yaml-cpp.git
+[submodule "Engine/vendor/ImGuizmo"]
+	path = Engine/vendor/ImGuizmo
+	url = https://github.com/TheJoKeR15/ImGuizmo.git

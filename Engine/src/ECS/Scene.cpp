@@ -3,13 +3,38 @@
 #include "ECS\Entity.h"
 #include "ECS\Components.h"
 
+#include "Renderer/Core/VertexArray.h"
+#include "Renderer/Shader.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace HEngine
 {
     Scene::Scene()
     {
-        entt::entity entt = m_Registry.create();
+        std::vector<FVertex> verts = {
+            { Vec3{-0.5f, -0.5f, 0.0f }, Vec4{1.0f}},
+            { Vec3{0.5f, -0.5f, 0.0f},   Vec4{1.0f}},
+            { Vec3{0.5f, 0.5f, 0.0f} ,   Vec4{1.0f}},
+            { Vec3{-0.5f, 0.5f, 0.0f},   Vec4{1.0f}},
+        };
+        std::vector<uint32_t> indx = { 0, 1, 2, 2, 3, 0 };
+        m_QuadVAO.reset(VertexArray::Create());
+        Ref<VertexBuffer> vertexBuffer;
+        vertexBuffer.reset(VertexBuffer::Create(verts, verts.size() * (sizeof(Vec3) + sizeof(Vec4))));
+        BufferLayout layout = {
+            { ShaderDataType::Float3, "a_Position" },
+            { ShaderDataType::Float4, "a_Color" }
+        };
+        vertexBuffer->SetLayout(layout);
+        m_QuadVAO->AddVertexBuffer(vertexBuffer);
+
+        Ref<IndexBuffer> indexBuffer;
+        indexBuffer.reset(IndexBuffer::Create(indx.data(), indx.size()));
+        m_QuadVAO->SetIndexBuffer(indexBuffer);
+
+
+        m_DefaultShader = std::make_shared<Shader>("assets/shaders/DefaultShader.glsl");
     }
 
     Scene::~Scene()

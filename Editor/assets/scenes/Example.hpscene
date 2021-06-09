@@ -1,0 +1,95 @@
+Scene: Untitled Scene
+Entities:
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Test Quad
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Editor Camera
+    TransformComponent:
+      Position: [0, 0, 3]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      FOV: 90
+      AspectRatio: 2.60168076
+      FarPlane: 1000
+      NearPlane: 0.100000001
+      Projection: 0
+      OrthographicFarPlane: 1
+      OrthographicNearPlane: -1
+      OrthographicSize: 10
+      PrimaryCamera: true
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Test Sprite
+    TransformComponent:
+      Position: [3.79999995, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 0.501960814, 0.501960814, 0.501960814]
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Position: [0, -2.20000005, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Position: [-3.79999995, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.891891897, 0.810229361, 0.0344359837, 1]
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Position: [0, 2.4000001, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.154440165, 0.167523026, 1, 1]
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Test Sprite
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.5, 0.5, 0.5, 0.5]
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Editor Camera
+    TransformComponent:
+      Position: [0, 0, 3]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraComponent:
+      FOV: 90
+      AspectRatio: 2.69874477
+      FarPlane: 1000
+      NearPlane: 0.100000001
+      Projection: 0
+      OrthographicFarPlane: 1
+      OrthographicNearPlane: -1
+      OrthographicSize: 10
+      PrimaryCamera: true
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Test Quad
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]

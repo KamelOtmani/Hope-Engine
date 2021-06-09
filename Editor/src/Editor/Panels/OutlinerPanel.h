@@ -11,6 +11,7 @@ public:
     OutlinerPanel(const Ref<HEngine::Scene>& scene);
 
     void SetContext(const Ref<HEngine::Scene>& scene);
+    HEngine::Entity GetSelectedEntity() const;
 
     void OnImGuiRender();
 private:

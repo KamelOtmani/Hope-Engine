@@ -1,5 +1,12 @@
 #include "EditorLayer.h"
 
+#include "ECS/Serializer.h"
+#include "Utility/PlatformUtils.h"
+
+#include <ImGuizmo.h>
+#include <glm/gtc/type_ptr.hpp>
+#include "Maths/Maths.h"
+
 using namespace HEngine;
 
 EditorLayer::EditorLayer()
@@ -24,7 +31,11 @@ void EditorLayer::OnAttach()
     EditorCamera.AddComponent<CameraComponent>();
     EditorCamera.GetComponent<TransformComponent>().Position = Vec3{ 0.0f,0.0f,3.0f };
     EditorCamera.GetComponent<CameraComponent>().bPrimary = true;
+
     m_OutlinerPanel.SetContext(m_Scene);
+
+    auto sprite = m_Scene->CreateEntity("Test Sprite");
+    sprite.AddComponent<SpriteRendererComponent>(Vec4{ 0.5f });
 
     auto main_Shader = new Shader("assets/shaders/simpleShader.glsl");
     testentt.GetComponent<MeshRendererComponent>().shader = main_Shader;
@@ -108,7 +119,23 @@ void EditorLayer::OnImGuiRender()
                 // which we can't undo at the moment without finer window depth/z control.
                 //ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 
-                if (ImGui::MenuItem("Exit")) HEngine::Application::Get().Close();
+                if (ImGui::MenuItem("New Scene","Ctrl+N"))
+                {
+                    NewScene();
+                }
+
+                if (ImGui::MenuItem("Open Scene","Ctrl+O"))
+                {
+                    OpenScene();
+                }
+
+                if (ImGui::MenuItem("Save Scene As", "Ctrl+S"))
+                {
+                    SaveSceneAs();
+                }
+
+                if (ImGui::MenuItem("Exit"))
+                    HEngine::Application::Get().Close();
                 ImGui::EndMenu();
             }
 
@@ -124,15 +151,81 @@ void EditorLayer::OnImGuiRender()
     Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
 
     auto ViewportPanelSize = ImGui::GetContentRegionAvail();
-    if ((m_ViewportHeight != ViewportPanelSize.y) | (m_ViewportWidth != ViewportPanelSize.x))
+    if (EditorCamera)
     {
-        m_ViewportHeight = ViewportPanelSize.y;
-        m_ViewportWidth = ViewportPanelSize.x;
-        m_MainFramebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
-        EditorCamera.GetComponent<CameraComponent>().aspectRatio = (float)m_ViewportWidth / (float)m_ViewportHeight;
+        if ((m_ViewportHeight != ViewportPanelSize.y) | (m_ViewportWidth != ViewportPanelSize.x))
+        {
+            m_ViewportHeight = ViewportPanelSize.y;
+            m_ViewportWidth = ViewportPanelSize.x;
+            m_MainFramebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+            EditorCamera.GetComponent<CameraComponent>().aspectRatio = (float)m_ViewportWidth / (float)m_ViewportHeight;
+        }
     }
     auto textID = m_MainFramebuffer->getColorAttachement();
     ImGui::Image((void*)textID, ViewportPanelSize, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+
+    // GUIZMOS
+    Entity selectedEntity = m_OutlinerPanel.GetSelectedEntity();
+
+    if (selectedEntity && m_GizmoType != -1)
+    {
+        ImGuizmo::SetOrthographic("false");
+        ImGuizmo::SetDrawlist();
+        float windowWidth = (float)ImGui::GetWindowWidth();
+        float windowHeight = (float)ImGui::GetWindowHeight();
+        ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y,windowWidth,windowHeight);
+
+        // camera
+        auto& cam = EditorCamera.GetComponent<CameraComponent>();
+        Mat4 cameraView = glm::inverse(EditorCamera.GetComponent<TransformComponent>().Matrix());
+        Mat4 cameraProjection = cam.Projection();
+
+        // Entity
+        auto& tc = selectedEntity.GetComponent<TransformComponent>();
+        Mat4 transform = tc.Matrix();
+
+        // Snapping
+        bool snap = Input::IsKeyPressed(Key::LeftControl);
+        float snapValue = 0.5f; // Snap to 0.5m for translation/scale
+        // Snap to 45 degrees for rotation
+        if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
+            snapValue = 45.0f;
+
+        float snapValues[3] = { snapValue, snapValue, snapValue };
+
+        ImGuizmo::OPERATION op = ImGuizmo::TRANSLATE;
+
+        switch (m_GizmoType)
+        {
+        case 0:
+            op = ImGuizmo::TRANSLATE; break;
+        case 1:
+            op = ImGuizmo::ROTATE; break;
+        case 2:
+            op = ImGuizmo::SCALE; break;
+        default:
+            break;
+        }
+
+        
+        ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+            op, ImGuizmo::LOCAL, glm::value_ptr(transform),
+            nullptr, snap ? snapValues : nullptr);
+
+        if (ImGuizmo::IsUsing())
+        {
+            Vec3 Translation, Rotation, Scale;
+            Math::DecomposeTransform(transform, Translation, Rotation,Scale);
+
+            Vec3 DeltaRotation = Rotation - tc.Rotation;
+            tc.Position = Translation;
+            tc.Rotation += DeltaRotation;
+            tc.Scale = Scale;
+
+        }
+
+    }
+
     ImGui::End();
     ImGui::PopStyleVar();
     m_OutlinerPanel.OnImGuiRender();
@@ -140,6 +233,80 @@ void EditorLayer::OnImGuiRender()
 
 void EditorLayer::OnEvent(HEngine::Event& event)
 {
-
+    EventDispatcher dispatcher(event);
+    dispatcher.Dispatch<KeyPressedEvent>(HBIND_EVENT(EditorLayer::OnKeyPressed));
 }
 
+bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
+{
+    // Shortcuts
+    if (e.GetRepeatCount() > 0)
+        return false;
+
+    bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl);
+    bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift);
+    switch (e.GetKeyCode())
+    {
+    case Key::N:
+    {
+        if (control)
+            NewScene();
+
+        break;
+    }
+    case Key::O:
+    {
+        if (control)
+            OpenScene();
+
+        break;
+    }
+    case Key::S:
+    {
+        if (control && shift)
+            SaveSceneAs();
+
+        break;
+    }
+    case Key::Space:
+    {
+        m_GizmoType = (m_GizmoType + 1)%3;
+        break;
+    }
+    case Key::Q:
+    {
+        m_GizmoType = -1;
+        break;
+    }
+    }
+}
+
+void EditorLayer::NewScene()
+{
+    m_Scene = CreateRef<Scene>();
+    m_OutlinerPanel.SetContext(m_Scene);
+    EditorCamera = {};
+}
+
+void EditorLayer::OpenScene()
+{
+    std::string filepath = FileDialogs::OpenFile("Hope Scene (*.hpscene)\0*.hpscene\0");
+    if (!filepath.empty())
+    {
+        m_Scene = CreateRef<Scene>();
+        m_OutlinerPanel.SetContext(m_Scene);
+
+        Serializer serializer(m_Scene);
+        serializer.Deserialize(filepath);
+    }
+}
+
+void EditorLayer::SaveSceneAs()
+{
+    std::string filepath = FileDialogs::SaveFile("Hope Scene (*.hpscene)\0*.hpscene\0");
+    if (!filepath.empty())
+    {
+        Serializer serializer(m_Scene);
+        serializer.Serialize(filepath);
+    }
+}
