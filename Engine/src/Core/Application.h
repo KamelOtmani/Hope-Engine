@@ -41,10 +41,9 @@ namespace HEngine {
 		std::unique_ptr<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
-		LayerStack m_LayerStack;
+        LayerStack m_LayerStack;
+        float m_LastFrameTime = 0.0f;
 
-        Ref<Shader> m_Shader;
-        Ref<VertexArray> m_VertexArray;
 	private:
 		static Application* s_Instance;
 	};

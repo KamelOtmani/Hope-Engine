@@ -154,7 +154,7 @@ namespace HEngine {
 		glfwDestroyWindow(m_Window);
 	}
 
-	void WindowsWindow::OnUpdate()
+	void WindowsWindow::OnUpdate(float dt)
 	{
 		glfwPollEvents();
 		m_Context->SwapBuffers();

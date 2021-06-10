@@ -1,17 +1,18 @@
 #pragma once
 #include "Core/Core.h"
+#include "Events/KeyCodes.h"
 
 namespace HEngine
 {
-	class HOPE_API Input
+	class Input
 	{
 	public:
 
-		static bool IsKeyPressed(int KeyCode);
-		inline static bool IsMouseButtonPressed(int button);
-		inline static std::pair<float, float> GetMousePosition();
-        inline static float GetMouseX();
-        inline static float GetMouseY();
+		static bool IsKeyPressed(const KeyCode code);
+		static bool IsMouseButtonPressed(const MouseCode code);
+		static std::pair<float, float> GetMousePosition();
+        static float GetMouseX();
+        static float GetMouseY(); 
 
 
 	};

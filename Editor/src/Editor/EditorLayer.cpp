@@ -13,10 +13,10 @@ EditorLayer::EditorLayer()
     : HEngine::Layer("Editor Layer")
 {
     m_Scene = std::make_shared<Scene>();
-
 }
 void EditorLayer::OnAttach()
 {
+    m_EditorCamera = EditorCamera(60.0f, 1.778f, 0.1f, 1000.0f);
     auto testentt = m_Scene->CreateEntity("Test Quad");
     std::vector<FVertex> verts = {
         {Vec3{ -0.5f, -0.5f, 0.0f }, Vec4{ 0.1f, 0.1f,0.8f,1.0f }},
@@ -26,11 +26,6 @@ void EditorLayer::OnAttach()
     };
     std::vector<uint32_t> indx = { 0, 1, 2, 2, 3, 0 };
     testentt.AddComponent<MeshRendererComponent>(verts, indx);
-
-    EditorCamera = m_Scene->CreateEntity("Editor Camera");
-    EditorCamera.AddComponent<CameraComponent>();
-    EditorCamera.GetComponent<TransformComponent>().Position = Vec3{ 0.0f,0.0f,3.0f };
-    EditorCamera.GetComponent<CameraComponent>().bPrimary = true;
 
     m_OutlinerPanel.SetContext(m_Scene);
 
@@ -49,11 +44,15 @@ void EditorLayer::OnAttach()
     m_MainFramebuffer = HEngine::Framebuffer::Create(fbspec);
 }
 
-void EditorLayer::OnUpdate()
+void EditorLayer::OnUpdate(float dt)
 {
+    // Update the camera  
+    m_EditorCamera.OnUpdate(dt);
+
+    // bind the frame buffer for rendering
     m_MainFramebuffer->Bind();
-    HEngine::Renderer::prepareScene(m_Scene.get());
-    HEngine::Renderer::submitScene(m_Scene.get());
+    HEngine::Renderer::PrepareScene(m_Scene.get());
+    HEngine::Renderer::SubmitScene(m_Scene.get(), m_EditorCamera);
     m_MainFramebuffer->UnBind();
 }
 void EditorLayer::OnImGuiRender()
@@ -151,15 +150,12 @@ void EditorLayer::OnImGuiRender()
     Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
 
     auto ViewportPanelSize = ImGui::GetContentRegionAvail();
-    if (EditorCamera)
+    if ((m_ViewportHeight != ViewportPanelSize.y) | (m_ViewportWidth != ViewportPanelSize.x))
     {
-        if ((m_ViewportHeight != ViewportPanelSize.y) | (m_ViewportWidth != ViewportPanelSize.x))
-        {
-            m_ViewportHeight = ViewportPanelSize.y;
-            m_ViewportWidth = ViewportPanelSize.x;
-            m_MainFramebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
-            EditorCamera.GetComponent<CameraComponent>().aspectRatio = (float)m_ViewportWidth / (float)m_ViewportHeight;
-        }
+        m_ViewportHeight = ViewportPanelSize.y;
+        m_ViewportWidth = ViewportPanelSize.x;
+        m_MainFramebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+        m_EditorCamera.SetViewportSize(m_ViewportWidth ,m_ViewportHeight);
     }
     auto textID = m_MainFramebuffer->getColorAttachement();
     ImGui::Image((void*)textID, ViewportPanelSize, ImVec2{ 0,1 }, ImVec2{ 1,0 });
@@ -175,10 +171,14 @@ void EditorLayer::OnImGuiRender()
         float windowHeight = (float)ImGui::GetWindowHeight();
         ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y,windowWidth,windowHeight);
 
-        // camera
-        auto& cam = EditorCamera.GetComponent<CameraComponent>();
-        Mat4 cameraView = glm::inverse(EditorCamera.GetComponent<TransformComponent>().Matrix());
-        Mat4 cameraProjection = cam.Projection();
+        //// camera
+        //auto& cam = EditorCamera.GetComponent<CameraComponent>();
+        //Mat4 cameraView = glm::inverse(EditorCamera.GetComponent<TransformComponent>().Matrix());
+        //Mat4 cameraProjection = cam.Projection();
+
+        // Editor camera
+        const glm::mat4& cameraProjection = m_EditorCamera.GetProjectionMatrix();
+        glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
 
         // Entity
         auto& tc = selectedEntity.GetComponent<TransformComponent>();
@@ -233,6 +233,7 @@ void EditorLayer::OnImGuiRender()
 
 void EditorLayer::OnEvent(HEngine::Event& event)
 {
+    m_EditorCamera.OnEvent(event);
     EventDispatcher dispatcher(event);
     dispatcher.Dispatch<KeyPressedEvent>(HBIND_EVENT(EditorLayer::OnKeyPressed));
 }
@@ -285,7 +286,6 @@ void EditorLayer::NewScene()
 {
     m_Scene = CreateRef<Scene>();
     m_OutlinerPanel.SetContext(m_Scene);
-    EditorCamera = {};
 }
 
 void EditorLayer::OpenScene()

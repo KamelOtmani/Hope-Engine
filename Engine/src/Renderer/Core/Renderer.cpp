@@ -10,25 +10,17 @@ namespace HEngine {
 	{
 
 	}
-	void Renderer::prepareScene(Scene* scene)
+	void Renderer::PrepareScene(Scene* scene)
 	{
 		//HLOG("Preparing scene");
 		RHICommand::SetClearColor(Vec4(0.1, 0.1, 0.5, 1));
 		RHICommand::Clear();
 	}
-	void Renderer::submitScene(Scene* scene)
+	void Renderer::SubmitScene(Scene* scene,EditorCamera& camera)
 	{
 		Mat4 ViewProjectionMatrix = Mat4(1.0f);
-		auto view = scene->m_Registry.view<CameraComponent,TransformComponent>();
-		for (auto entity : view)
-		{
-			auto [cam, transform] = view.get<CameraComponent,TransformComponent>(entity);
-			if (cam.bPrimary)
-			{
-				ViewProjectionMatrix = cam.Projection() * glm::inverse(transform.Matrix());
-				break;
-			}
-		}
+		ViewProjectionMatrix = camera.GetViewProjection();
+
 		auto group = scene->m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
 		for (auto entity : group)
 		{

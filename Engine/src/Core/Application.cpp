@@ -5,6 +5,7 @@
 
 
 #include "Renderer/Core/Renderer.h"
+#include <GLFW\glfw3.h>
 
 namespace HEngine {
 
@@ -42,16 +43,19 @@ namespace HEngine {
 	{
 		while (m_Running)
 		{
+            float time = (float)glfwGetTime();
+            float dt = time - m_LastFrameTime;
+            m_LastFrameTime = time;
 
 			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate();
+				layer->OnUpdate(dt);
 
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)
 				layer->OnImGuiRender();
 			m_ImGuiLayer->End();
 
-			m_Window->OnUpdate();
+			m_Window->OnUpdate(dt);
 		}
 	}
 
