@@ -8,6 +8,8 @@
 #include <Renderer\Shader.h>
 #include "Renderer/Core/VertexArray.h"
 
+#include "Utility/AssetImporter.h"
+
 namespace HEngine
 {
     struct TagComponent
@@ -78,6 +80,29 @@ namespace HEngine
             vertexArray->SetIndexBuffer(indexBuffer);
         }
         ~MeshRendererComponent() = default;
+
+        void UpdateMesh(std::string& path)
+        {
+            auto& res = AssetImporter::ImportModel(path);
+            _data = res.verts;
+            _indices = res.indices;
+
+            vertexArray.reset(VertexArray::Create());
+            Ref<VertexBuffer> vertexBuffer;
+            vertexBuffer.reset(VertexBuffer::Create(_data, _data.size() * (sizeof(Vec3) + sizeof(Vec4))));
+            BufferLayout layout = {
+                { ShaderDataType::Float3, "a_Position" },
+                { ShaderDataType::Float4, "a_Color" }
+            };
+            vertexBuffer->SetLayout(layout);
+            vertexArray->AddVertexBuffer(vertexBuffer);
+
+            Ref<IndexBuffer> indexBuffer;
+            indexBuffer.reset(IndexBuffer::Create(_indices.data(), _indices.size()));
+            vertexArray->SetIndexBuffer(indexBuffer);
+        };
+
+        std::string path = std::string();
         Ref<VertexArray> vertexArray;
         Shader* shader = nullptr;
         Ref<VertexArray>& getVertexArray() { return vertexArray; };

@@ -17,7 +17,8 @@ EditorLayer::EditorLayer()
 void EditorLayer::OnAttach()
 {
     m_EditorCamera = EditorCamera(60.0f, 1.778f, 0.1f, 1000.0f);
-    auto testentt = m_Scene->CreateEntity("Test Quad");
+
+    auto testentt = m_Scene->CreateEntity("Test mesh");
     std::vector<FVertex> verts = {
         {Vec3{ -0.5f, -0.5f, 0.0f }, Vec4{ 0.1f, 0.1f,0.8f,1.0f }},
         { Vec3{0.5f, -0.5f, 0.0f},   Vec4{0.8f, 0.1f,0.8f,1.0f} },
@@ -57,7 +58,6 @@ void EditorLayer::OnUpdate(float dt)
 }
 void EditorLayer::OnImGuiRender()
 {
-
     // Note: Switch this to true to enable dockspace
     static bool dockingEnabled = true;
     if (dockingEnabled)
@@ -221,14 +221,14 @@ void EditorLayer::OnImGuiRender()
             tc.Position = Translation;
             tc.Rotation += DeltaRotation;
             tc.Scale = Scale;
-
         }
-
     }
 
     ImGui::End();
     ImGui::PopStyleVar();
     m_OutlinerPanel.OnImGuiRender();
+
+
 }
 
 void EditorLayer::OnEvent(HEngine::Event& event)

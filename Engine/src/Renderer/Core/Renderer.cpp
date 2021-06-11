@@ -24,15 +24,19 @@ namespace HEngine {
 		auto group = scene->m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
 		for (auto entity : group)
 		{
+			
 			auto [xform, mesh] = group.get<TransformComponent, MeshRendererComponent>(entity);
-			if (mesh.shader != nullptr)
-			{
-				mesh.shader->Bind();
-				mesh.shader->SetMat4("u_Transform", xform.Matrix());
-				mesh.shader->SetMat4("u_ViewProjection",ViewProjectionMatrix);
-			}
-			mesh.vertexArray->Bind();
-			RHICommand::DrawIndexed(mesh.vertexArray);
+            if (!mesh.path.empty())
+            {
+                if (mesh.shader != nullptr)
+                {
+                    mesh.shader->Bind();
+                    mesh.shader->SetMat4("u_Transform", xform.Matrix());
+                    mesh.shader->SetMat4("u_ViewProjection", ViewProjectionMatrix);
+                }
+                mesh.vertexArray->Bind();
+                RHICommand::DrawIndexed(mesh.vertexArray);
+            }
 
 		}
 

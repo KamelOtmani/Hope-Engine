@@ -14,6 +14,8 @@ namespace HEngine {
         Scene();
         ~Scene();
 
+        void Initialize();
+
         void setupScene();
 
         Entity CreateEntity(const std::string& name = std::string());

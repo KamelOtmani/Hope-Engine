@@ -5,6 +5,4 @@
 struct FVertex {
     Vec3 Position;
     Vec4 Color;
-
-
 };

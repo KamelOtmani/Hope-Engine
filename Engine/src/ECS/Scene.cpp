@@ -41,6 +41,16 @@ namespace HEngine
     {
     }
 
+    void Scene::Initialize()
+    {
+        auto view = m_Registry.view<MeshRendererComponent>();
+        for (auto entity : view)
+        {
+            auto& mesh = view.get<MeshRendererComponent>(entity);
+            // setup meshes
+        }
+    }
+
     void Scene::setupScene()
     {
     }

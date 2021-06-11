@@ -4,6 +4,7 @@
 #include <imgui_internal.h>
 
 #include "ECS\Components.h"
+#include "Utility\PlatformUtils.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -205,7 +206,17 @@ void OutlinerPanel::DrawComponents(HEngine::Entity entity)
             }
 
         }
-        
+
+        if (!m_SelectionContext.HasComponent<MeshRendererComponent>())
+        {
+            if (ImGui::MenuItem("Mesh Component"))
+            {
+
+                m_SelectionContext.AddComponent<MeshRendererComponent>();
+                m_SelectionContext.GetComponent<MeshRendererComponent>().shader = m_Scene->m_DefaultShader.get();
+                ImGui::CloseCurrentPopup();
+            }
+        }
 
         ImGui::EndPopup();
     }
@@ -296,5 +307,22 @@ void OutlinerPanel::DrawComponents(HEngine::Entity entity)
             ImGui::ColorEdit4("Color", glm::value_ptr(sprite.m_Color));
         });
 
+    DrawComponent<MeshRendererComponent>("Mesh Renderer Component", entity, [](auto& component)
+        {
+            char buffer[256];
+            memset(buffer, 0, sizeof(buffer));
+            strcpy_s(buffer, sizeof(buffer), component.path.c_str());
+            if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
+            {
+                component.path = std::string(buffer);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("..."))
+            {
+                component.path = FileDialogs::OpenFile("Wavefront (*.obj)\0*.obj\FBX (*.fbx)\0*.fbx\0");
+                if (!component.path.empty())
+                    component.UpdateMesh(component.path);
+            }
+        });
 
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #define HOPE_DYNAMIC_LINK 0
 
@@ -53,3 +54,6 @@ constexpr Ref<T> CreateRef(Args&& ... args)
 {
     return std::make_shared<T>(std::forward<Args>(args)...);
 }
+
+template<typename T>
+using Vector = std::vector<T>;

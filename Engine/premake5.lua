@@ -39,7 +39,8 @@ project "Engine"
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.ImGuizmo}",
-		"%{IncludeDir.yaml_cpp}"
+		"%{IncludeDir.yaml_cpp}",
+		-- "%{IncludeDir.assimp}",
 	}
 
 	links
@@ -48,6 +49,8 @@ project "Engine"
 		"Glad",
 		"ImGui",
 		"yaml-cpp",
+		-- "assimp-vc142-mtd.lib",
+		-- "assimp",
 		"opengl32.lib"
 	}
 

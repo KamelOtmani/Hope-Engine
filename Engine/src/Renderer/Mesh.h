@@ -1,22 +1,20 @@
 #pragma once
 
+#include "Core/Core.h"
+#include "Renderer\Commun.h"
 #include "Renderer\Commun.h"
 
 namespace HEngine {
 
-
     class Mesh
     {
-        Mesh() = default;
-        ~Mesh() = default;
+    public:
+        Mesh(Vector<FVertex> vertices, Vector<unsigned int> indices);
 
-        void setInternal(const std::vector<FVertex>& data, const std::vector<uint32_t>& indices);
-        std::vector<FVertex> getData();
-        std::vector<uint32_t> getIndicies();
-
-    private:
-        std::vector<FVertex> _data;
-        std::vector<uint32_t> _indices;
+        // mesh data
+        Vector<FVertex> m_Vertices;
+        Vector<uint32_t> m_Indices;
+        //Vector<Texture> textures;
     };
 
 }

@@ -142,6 +142,18 @@ namespace HEngine {
             out << YAML::EndMap; // SpriteRendererComponent
         }
 
+        if (entity.HasComponent<MeshRendererComponent>())
+        {
+            out << YAML::Key << "MeshRendererComponenet";
+            out << YAML::BeginMap; // MeshRendererComponenet
+
+            auto& mesh = entity.GetComponent<MeshRendererComponent>();
+            out << YAML::Key << "Path" << YAML::Value << mesh.path;
+
+            out << YAML::EndMap; // MeshRendererComponenet
+        }
+
+
         out << YAML::EndMap; // Entity
     }
 
@@ -229,6 +241,17 @@ namespace HEngine {
                     auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
                     src.m_Color = spriteRendererComponent["Color"].as<Vec4>();
                 }
+
+                auto meshRendererComponent = entity["MeshRendererComponent"];
+                if (spriteRendererComponent)
+                {
+                    auto& src = deserializedEntity.AddComponent<MeshRendererComponent>();
+                    src.path = meshRendererComponent["Path"].as<std::string>();
+                    if (!src.path.empty())
+                        src.UpdateMesh(src.path);
+                }
+
+
             }
         }
 
