@@ -72,7 +72,7 @@ StyleCopReport.xml
 *_h.h
 *.ilk
 *.meta
-*.obj
+#*.obj
 *.iobj
 *.pch
 *.pdb
@@ -366,3 +366,7 @@ bin-int/Debug-x86_64/GLFW/GLFW.vcxproj.FileListAbsolute.txt
 Sandbox/imgui.ini
 
 Engine/vendor/assimp/
+
+Editor/assets/meshs/Sponza-master/
+
+Editor/assets/meshs/textures/

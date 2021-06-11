@@ -213,7 +213,7 @@ void OutlinerPanel::DrawComponents(HEngine::Entity entity)
             {
 
                 m_SelectionContext.AddComponent<MeshRendererComponent>();
-                m_SelectionContext.GetComponent<MeshRendererComponent>().shader = m_Scene->m_DefaultShader.get();
+                m_SelectionContext.GetComponent<MeshRendererComponent>().material = m_Scene->m_DefaultMaterial;
                 ImGui::CloseCurrentPopup();
             }
         }
@@ -307,7 +307,7 @@ void OutlinerPanel::DrawComponents(HEngine::Entity entity)
             ImGui::ColorEdit4("Color", glm::value_ptr(sprite.m_Color));
         });
 
-    DrawComponent<MeshRendererComponent>("Mesh Renderer Component", entity, [](auto& component)
+    DrawComponent<MeshRendererComponent>("Mesh Renderer Component", entity, [this](auto& component)
         {
             char buffer[256];
             memset(buffer, 0, sizeof(buffer));
@@ -319,9 +319,23 @@ void OutlinerPanel::DrawComponents(HEngine::Entity entity)
             ImGui::SameLine();
             if (ImGui::Button("..."))
             {
-                component.path = FileDialogs::OpenFile("Wavefront (*.obj)\0*.obj\FBX (*.fbx)\0*.fbx\0");
+                component.path = FileDialogs::OpenFile("Wavefront (*.obj)\0*.obj\0FBX (*.fbx)\0*.fbx\0");
                 if (!component.path.empty())
-                    component.UpdateMesh(component.path);
+                    component.UpdateMesh();
+            }
+            if (component.material)
+            {
+                if (ImGui::BeginCombo("##Material", component.material->name.c_str()))
+                {
+                    for (const auto& mat : m_Scene->MatLibrary.Library)
+                    {
+                        ImGui::PushID(mat->name.size() + (int*)mat.get());
+                        if (ImGui::Selectable(mat->name.c_str(), mat == component.material))
+                            component.material = mat;
+                        ImGui::PopID();
+                    }
+                    ImGui::EndCombo();
+                }
             }
         });
 

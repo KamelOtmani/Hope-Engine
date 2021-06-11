@@ -30,6 +30,7 @@
 #include "Renderer/Texture.h"
 #include "Renderer/Commun.h"
 #include "Renderer/Framebuffer.h"
+#include "Renderer/Material.h"
 //----------------------------------------
 // STD Library
 //----------------------------------------

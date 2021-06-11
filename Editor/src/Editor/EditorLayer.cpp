@@ -1,4 +1,5 @@
 #include "EditorLayer.h"
+#include "HEngine.h"
 
 #include "ECS/Serializer.h"
 #include "Utility/PlatformUtils.h"
@@ -16,33 +17,34 @@ EditorLayer::EditorLayer()
 }
 void EditorLayer::OnAttach()
 {
+
     m_EditorCamera = EditorCamera(60.0f, 1.778f, 0.1f, 1000.0f);
 
     auto testentt = m_Scene->CreateEntity("Test mesh");
     std::vector<FVertex> verts = {
-        {Vec3{ -0.5f, -0.5f, 0.0f }, Vec4{ 0.1f, 0.1f,0.8f,1.0f }},
-        { Vec3{0.5f, -0.5f, 0.0f},   Vec4{0.8f, 0.1f,0.8f,1.0f} },
-        { Vec3{0.5f, 0.5f, 0.0f} ,   Vec4{0.8f, 0.1f,0.8f,1.0f} },
-        { Vec3{-0.5f, 0.5f, 0.0f},   Vec4{0.8f, 0.1f,0.8f,1.0f} },
+            { Vec3{-0.5f, -0.5f, 0.0f }  ,Vec3{0.0f,0.0f,1.0f }  , Vec4{1.0f}},
+            { Vec3{0.5f, -0.5f, 0.0f}    ,Vec3{0.0f,0.0f,1.0f },   Vec4{1.0f}},
+            { Vec3{0.5f, 0.5f, 0.0f}     ,Vec3{0.0f,0.0f,1.0f },   Vec4{1.0f}},
+            { Vec3{-0.5f, 0.5f, 0.0f}    ,Vec3{0.0f,0.0f,1.0f },   Vec4{1.0f}}
     };
     std::vector<uint32_t> indx = { 0, 1, 2, 2, 3, 0 };
     testentt.AddComponent<MeshRendererComponent>(verts, indx);
 
     m_OutlinerPanel.SetContext(m_Scene);
 
-    auto sprite = m_Scene->CreateEntity("Test Sprite");
+    auto& sprite = m_Scene->CreateEntity("Test Sprite");
     sprite.AddComponent<SpriteRendererComponent>(Vec4{ 0.5f });
 
-    auto main_Shader = new Shader("assets/shaders/simpleShader.glsl");
-    testentt.GetComponent<MeshRendererComponent>().shader = main_Shader;
-
-    defaultTexture = HEngine::Texture2D::Create("assets/textures/test.jpg");
+    testentt.GetComponent<MeshRendererComponent>().material = m_Scene->m_DefaultMaterial;
+    testentt.GetComponent<MeshRendererComponent>().path = "assets/meshs/Cube_1m.obj";
+    testentt.GetComponent<MeshRendererComponent>().UpdateMesh();
 
     HEngine::FramebufferSpecification fbspec;
     fbspec.width = 1600;
     fbspec.height = 900;
 
     m_MainFramebuffer = HEngine::Framebuffer::Create(fbspec);
+    HEngine::Renderer::Initialise();
 }
 
 void EditorLayer::OnUpdate(float dt)
@@ -128,9 +130,15 @@ void EditorLayer::OnImGuiRender()
                     OpenScene();
                 }
 
+
                 if (ImGui::MenuItem("Save Scene As", "Ctrl+S"))
                 {
                     SaveSceneAs();
+                }
+                ImGui::Separator();
+                if (ImGui::MenuItem("Import scene from model", "Ctrl+O"))
+                {
+                    ImportMeshes();
                 }
 
                 if (ImGui::MenuItem("Exit"))
@@ -228,7 +236,36 @@ void EditorLayer::OnImGuiRender()
     ImGui::PopStyleVar();
     m_OutlinerPanel.OnImGuiRender();
 
+    // Material editor
+    ImGui::Begin("Material editor");
 
+    if (ImGui::Button("Add new Material"))
+    {
+        m_Scene->MatLibrary.AddNewMaterial(std::string("UNNAMED MATERIAL"));
+        m_Scene->MatLibrary.Library.back()->shader = m_Scene->m_DefaultShader;
+    }
+    auto& mats = m_Scene->MatLibrary.Library;
+
+    for (auto& mat : mats)
+    {
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+
+        if (ImGui::TreeNodeEx((void*)mat.get(), flags, mat->name.c_str()))
+        {
+            char buffer[256];
+            memset(buffer, 0, sizeof(buffer));
+            strcpy_s(buffer, sizeof(buffer), mat->name.c_str());
+            if (ImGui::InputText("Name", buffer, sizeof(buffer)))
+            {
+                mat->name = std::string(buffer);
+            }
+            ImGui::ColorEdit4("Color", glm::value_ptr(mat->Color));
+            ImGui::TreePop();
+        }
+    }
+
+    
+    ImGui::End();
 }
 
 void EditorLayer::OnEvent(HEngine::Event& event)
@@ -279,6 +316,14 @@ bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
         m_GizmoType = -1;
         break;
     }
+    case Key::F:
+    {
+        if (m_OutlinerPanel.m_SelectionContext)
+        {
+            m_EditorCamera.SetFocus(m_OutlinerPanel.m_SelectionContext.GetComponent<TransformComponent>().Position);
+        }
+        break;
+    }
     }
 }
 
@@ -308,5 +353,14 @@ void EditorLayer::SaveSceneAs()
     {
         Serializer serializer(m_Scene);
         serializer.Serialize(filepath);
+    }
+}
+
+void EditorLayer::ImportMeshes()
+{
+    std::string filepath = FileDialogs::OpenFile("Hope Scene (*.hpscene)\0*.hpscene\0");
+    if (!filepath.empty())
+    {
+        AssetImporter::ImportScene(filepath, m_Scene.get());
     }
 }

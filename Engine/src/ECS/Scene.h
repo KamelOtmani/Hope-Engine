@@ -1,6 +1,8 @@
 #pragma once
 
 #include "entt.hpp"
+#include "Renderer/Material.h"
+#include "Renderer/Texture.h"
 
 namespace HEngine {
     class Entity;
@@ -21,10 +23,13 @@ namespace HEngine {
         Entity CreateEntity(const std::string& name = std::string());
         void DestroyEntity(Entity entity);
 
+        MaterialLibrary MatLibrary;
         std::string m_SceneName = "Untitled Scene";
         entt::registry m_Registry;
         Ref<VertexArray> m_QuadVAO;
         Ref<Shader> m_DefaultShader;
+        Ref<HEngine::Texture2D> m_DefaultTexture;
+        Ref<HEngine::Material> m_DefaultMaterial;
     private:
 
         friend class Entity;

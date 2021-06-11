@@ -7,6 +7,8 @@
 
 namespace HEngine
 {
+    class Scene;
+
     struct Model
     {
         Vector<FVertex> verts;
@@ -16,6 +18,7 @@ namespace HEngine
     {
     public:
         static Model ImportModel(std::string& path);
+        static void ImportScene(std::string& path, Scene* m_scene);
 
     };
 }

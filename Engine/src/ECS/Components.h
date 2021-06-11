@@ -67,9 +67,10 @@ namespace HEngine
             _indices = indices;
             vertexArray.reset(VertexArray::Create());
             Ref<VertexBuffer> vertexBuffer;
-            vertexBuffer.reset(VertexBuffer::Create(vertices, vertices.size() * (sizeof(Vec3) + sizeof(Vec4))));
+            vertexBuffer.reset(VertexBuffer::Create(vertices, vertices.size() * (sizeof(Vec3) + sizeof(Vec3)+ sizeof(Vec4))));
             BufferLayout layout = {
                 { ShaderDataType::Float3, "a_Position" },
+                { ShaderDataType::Float3, "a_Normal" },
                 { ShaderDataType::Float4, "a_Color" }
             };
             vertexBuffer->SetLayout(layout);
@@ -81,7 +82,7 @@ namespace HEngine
         }
         ~MeshRendererComponent() = default;
 
-        void UpdateMesh(std::string& path)
+        void UpdateMesh()
         {
             auto& res = AssetImporter::ImportModel(path);
             _data = res.verts;
@@ -89,9 +90,10 @@ namespace HEngine
 
             vertexArray.reset(VertexArray::Create());
             Ref<VertexBuffer> vertexBuffer;
-            vertexBuffer.reset(VertexBuffer::Create(_data, _data.size() * (sizeof(Vec3) + sizeof(Vec4))));
+            vertexBuffer.reset(VertexBuffer::Create(_data, _data.size() * (sizeof(Vec3) + sizeof(Vec3) + sizeof(Vec4))));
             BufferLayout layout = {
                 { ShaderDataType::Float3, "a_Position" },
+                { ShaderDataType::Float3, "a_Normal" },
                 { ShaderDataType::Float4, "a_Color" }
             };
             vertexBuffer->SetLayout(layout);
@@ -104,7 +106,7 @@ namespace HEngine
 
         std::string path = std::string();
         Ref<VertexArray> vertexArray;
-        Shader* shader = nullptr;
+        Ref<Material> material;
         Ref<VertexArray>& getVertexArray() { return vertexArray; };
     private:
         std::vector<FVertex> _data;

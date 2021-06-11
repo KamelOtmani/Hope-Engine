@@ -56,6 +56,8 @@ namespace HEngine {
 	private:
 		entt::entity m_id = entt::null;
 		Scene* scene = nullptr;
+
+		friend class Serializer;
 	};
 
 	//struct CameraComponent : Component

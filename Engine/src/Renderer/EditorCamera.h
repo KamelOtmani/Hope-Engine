@@ -19,6 +19,9 @@ namespace HEngine {
 
         inline float GetDistance() const { return m_Distance; }
         inline void SetDistance(float distance) { m_Distance = distance; }
+        inline void SetFocus(Vec3 point) {
+            m_FocalPoint = point; UpdateView();
+        }
 
         inline void SetViewportSize(float width, float height) { m_ViewportWidth = width; m_ViewportHeight = height; UpdateProjection(); }
 
@@ -55,8 +58,8 @@ namespace HEngine {
         Mat4 m_ViewMatrix;
         Mat4 m_Projection;
         Vec3 m_Position = { 0.0f, 0.0f, 0.0f };
-        Vec3 m_FocalPoint = { 0.0f, 0.0f, 0.0f };
         Vec2 m_InitialMousePosition = { 0.0f, 0.0f };
+        Vec3 m_FocalPoint = { 0.0f, 0.0f, 0.0f };
 
         float m_Distance = 10.0f;
         float m_Pitch = 0.0f, m_Yaw = 0.0f;

@@ -4,11 +4,14 @@
 #include "Renderer/Shader.h"
 #include "Renderer/Material.h"
 #include <ECS\Components.h>
+#include <glad\glad.h>
 
 namespace HEngine {
 	void Renderer::Initialise()
 	{
-
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 	}
 	void Renderer::PrepareScene(Scene* scene)
 	{
@@ -24,19 +27,19 @@ namespace HEngine {
 		auto group = scene->m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
 		for (auto entity : group)
 		{
-			
 			auto [xform, mesh] = group.get<TransformComponent, MeshRendererComponent>(entity);
-            if (!mesh.path.empty())
-            {
-                if (mesh.shader != nullptr)
+            //if (!mesh.path.empty())
+            //{
+                if (mesh.material->shader != nullptr)
                 {
-                    mesh.shader->Bind();
-                    mesh.shader->SetMat4("u_Transform", xform.Matrix());
-                    mesh.shader->SetMat4("u_ViewProjection", ViewProjectionMatrix);
+                    mesh.material->shader->Bind();
+                    mesh.material->shader->SetMat4("u_Transform", xform.Matrix());
+                    mesh.material->shader->SetMat4("u_ViewProjection", ViewProjectionMatrix);
+					mesh.material->ApplyMaterial();
                 }
                 mesh.vertexArray->Bind();
                 RHICommand::DrawIndexed(mesh.vertexArray);
-            }
+            //}
 
 		}
 

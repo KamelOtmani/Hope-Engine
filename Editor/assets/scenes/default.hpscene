@@ -1,0 +1,23 @@
+Scene: Untitled Scene
+Entities:
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Test Sprite
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [0.5, 0.5, 0.5, 0.5]
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Test mesh
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      Path: assets/meshs/Cube_1m.obj
+      Material:
+        Name: DefaultMaterial
+        Color: [1, 1, 1, 1]

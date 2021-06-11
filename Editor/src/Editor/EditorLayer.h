@@ -25,6 +25,7 @@ private:
     void NewScene();
     void OpenScene();
     void SaveSceneAs();
+    void ImportMeshes();
 
 private:
     Ref<HEngine::Scene> m_Scene;
@@ -41,6 +42,4 @@ private:
     bool m_ViewportFocused = false, m_ViewportHovered = false;
     int m_GizmoType = -1;
 
-    // Default resources
-    Ref<HEngine::Texture2D> defaultTexture;
 };

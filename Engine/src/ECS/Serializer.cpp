@@ -82,7 +82,7 @@ namespace HEngine {
     {
     }
 
-    static void SerializeEntity(YAML::Emitter& out, Entity entity)
+    static void SerializeEntity(YAML::Emitter& out, Entity entity, Scene* scene)
     {
         out << YAML::BeginMap; // Entity
         out << YAML::Key << "Entity" << YAML::Value << "12837192831273"; // TODO: Entity ID goes here
@@ -144,17 +144,24 @@ namespace HEngine {
 
         if (entity.HasComponent<MeshRendererComponent>())
         {
-            out << YAML::Key << "MeshRendererComponenet";
+            out << YAML::Key << "MeshRendererComponent";
             out << YAML::BeginMap; // MeshRendererComponenet
 
             auto& mesh = entity.GetComponent<MeshRendererComponent>();
             out << YAML::Key << "Path" << YAML::Value << mesh.path;
+
+            out << YAML::Key << "Material";// Material
+            out << YAML::BeginMap << YAML::Key << "Name" << YAML::Value << mesh.material->name;
+            out << YAML::Key << "Color" << YAML::Value << mesh.material->Color;
+            out << YAML::EndMap; // Material
 
             out << YAML::EndMap; // MeshRendererComponenet
         }
 
 
         out << YAML::EndMap; // Entity
+
+
     }
 
     void Serializer::Serialize(const std::string& filepath)
@@ -169,10 +176,12 @@ namespace HEngine {
                 if (!entity)
                     return;
 
-                SerializeEntity(out, entity);
+                SerializeEntity(out, entity,m_Scene.get());
             });
         out << YAML::EndSeq;
         out << YAML::EndMap;
+
+
 
         std::ofstream fout(filepath);
         fout << out.c_str();
@@ -192,6 +201,8 @@ namespace HEngine {
         std::string sceneName = data["Scene"].as<std::string>();
         m_Scene->m_SceneName = sceneName;
         HEngineLOG("Deserializing scene '{0}'", sceneName);
+
+
 
         auto entities = data["Entities"];
         if (entities)
@@ -243,17 +254,37 @@ namespace HEngine {
                 }
 
                 auto meshRendererComponent = entity["MeshRendererComponent"];
-                if (spriteRendererComponent)
+                if (meshRendererComponent)
                 {
-                    auto& src = deserializedEntity.AddComponent<MeshRendererComponent>();
-                    src.path = meshRendererComponent["Path"].as<std::string>();
-                    if (!src.path.empty())
-                        src.UpdateMesh(src.path);
+                    auto& mrc = deserializedEntity.AddComponent<MeshRendererComponent>();
+                    if (meshRendererComponent["Path"])
+                    {
+                        mrc.path = meshRendererComponent["Path"].as<std::string>();
+                        if (!mrc.path.empty())
+                            mrc.UpdateMesh();
+                         
+                        if (meshRendererComponent["Material"])
+                        {
+                            auto material = meshRendererComponent["Material"];
+                            auto& name = material["Name"].as<std::string>();
+                            auto& mat = m_Scene->MatLibrary.GetMaterialbyName(name);
+                            if (mat)
+                                mrc.material = mat;
+                            else
+                            {
+                                mat = m_Scene->MatLibrary.AddNewMaterial(name);
+                                mat->shader = m_Scene->m_DefaultShader;
+                                mat->Color = material["Color"].as<Vec4>();
+                                mrc.material = mat;
+                            }
+                        }
+                    }
                 }
 
 
             }
         }
+
 
         return true;
     }
