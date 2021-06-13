@@ -8,7 +8,8 @@
 
 namespace HEngine {
 	void Renderer::Initialise()
-	{
+    {
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
@@ -23,24 +24,47 @@ namespace HEngine {
 	{
 		Mat4 ViewProjectionMatrix = Mat4(1.0f);
 		ViewProjectionMatrix = camera.GetViewProjection();
+        Vec3 lightPos = Vec3{ 0.0f };
+        Vec4 LightColor = Vec4{ 1.0f };
+		float LightIntensity = 1.0f;
 
-		auto group = scene->m_Registry.group<TransformComponent>(entt::get<MeshRendererComponent>);
-		for (auto entity : group)
-		{
-			auto [xform, mesh] = group.get<TransformComponent, MeshRendererComponent>(entity);
-            //if (!mesh.path.empty())
-            //{
-                if (mesh.material->shader != nullptr)
+		// LIGHTS
+        {
+            auto group = scene->m_Registry.group<TransformComponent>(entt::get<PointLightComponent>);
+            for (auto entity : group)
+            {
+                auto [xform, light] = group.get<TransformComponent, PointLightComponent>(entity);
+                if (light.bAffectWorld)
                 {
-                    mesh.material->shader->Bind();
-                    mesh.material->shader->SetMat4("u_Transform", xform.Matrix());
-                    mesh.material->shader->SetMat4("u_ViewProjection", ViewProjectionMatrix);
-					mesh.material->ApplyMaterial();
+					lightPos = xform.Position;
+					LightIntensity = light.m_Intensity;
+					LightColor = light.m_Color;
                 }
-                mesh.vertexArray->Bind();
-                RHICommand::DrawIndexed(mesh.vertexArray);
-            //}
+            }
+        }
 
+		{
+			auto group = scene->m_Registry.view<TransformComponent,MeshRendererComponent>();
+			for (auto entity : group)
+			{
+				auto [xform, mesh] = group.get<TransformComponent, MeshRendererComponent>(entity);
+				if (!mesh.bEmpty && mesh.bSouldRender)
+				{
+					if (mesh.material->shader != nullptr)
+					{
+						mesh.material->shader->Bind();
+                        mesh.material->shader->SetFloat3("u_CameraPositionWS", camera.GetPosition());
+                        mesh.material->shader->SetFloat3("u_LightPosWS", lightPos);
+                        mesh.material->shader->SetFloat3("u_LightColor", LightColor*LightIntensity);
+						mesh.material->shader->SetMat4("u_Transform", xform.Matrix());
+						mesh.material->shader->SetMat4("u_ViewProjection", ViewProjectionMatrix);
+						mesh.material->ApplyMaterial();
+					}
+					mesh.vertexArray->Bind();
+					RHICommand::DrawIndexed(mesh.vertexArray);
+				}
+
+			}
 		}
 
         auto group2 = scene->m_Registry.view<TransformComponent,SpriteRendererComponent>();

@@ -63,18 +63,20 @@ namespace HEngine
             }
         }
 
-        void ProcessSceneMesh(aiMesh* mesh, const aiScene* scene, Scene* m_scene)
+        void ProcessSceneMesh(aiMesh* mesh, const aiScene* scene, Scene* m_scene, float scale)
         {
             auto& entt = m_scene->CreateEntity(mesh->mName.C_Str());
-            entt.GetComponent<TransformComponent>().Scale = Vec3(0.01f);
+            entt.GetComponent<TransformComponent>().Scale = Vec3(scale);
             Vector<FVertex> vertices{};
             Vector<uint32_t> indices{};
             ProcessMesh(mesh, scene, vertices, indices);
-            entt.AddComponent<MeshRendererComponent>(vertices, indices).material = m_scene->m_DefaultMaterial;
+            auto& mrc = entt.AddComponent<MeshRendererComponent>(vertices, indices);
+            mrc.material = m_scene->m_DefaultMaterial;
+            mrc.bEmpty = false;
 
         }
 
-        void ProcessSceneNode(aiNode* node, const aiScene* scene, Scene* m_scene)
+        void ProcessSceneNode(aiNode* node, const aiScene* scene, Scene* m_scene, float scale)
         {
             // process each mesh located at the current node
             for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -82,12 +84,12 @@ namespace HEngine
                 // the node object only contains indices to index the actual objects in the scene. 
                 // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
                 aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-                ProcessSceneMesh(mesh, scene,m_scene);
+                ProcessSceneMesh(mesh, scene,m_scene, scale);
             }
             // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
             for (unsigned int i = 0; i < node->mNumChildren; i++)
             {
-                ProcessSceneNode(node->mChildren[i], scene,m_scene);
+                ProcessSceneNode(node->mChildren[i], scene,m_scene, scale);
             }
         }
 
@@ -108,11 +110,11 @@ namespace HEngine
             return model;
         }
 
-        void AssetImporter::ImportScene(std::string& path,Scene* m_scene)
+        void AssetImporter::ImportScene(std::string& path,Scene* m_scene, float scale)
         {
             Assimp::Importer importer;
             const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
-            ProcessSceneNode(scene->mRootNode, scene, m_scene);
+            ProcessSceneNode(scene->mRootNode, scene, m_scene, scale);
         }
 
 }

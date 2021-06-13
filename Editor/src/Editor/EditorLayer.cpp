@@ -35,6 +35,10 @@ void EditorLayer::OnAttach()
     auto& sprite = m_Scene->CreateEntity("Test Sprite");
     sprite.AddComponent<SpriteRendererComponent>(Vec4{ 0.5f });
 
+
+    auto& light = m_Scene->CreateEntity("Point light");
+    light.AddComponent<PointLightComponent>();
+
     testentt.GetComponent<MeshRendererComponent>().material = m_Scene->m_DefaultMaterial;
     testentt.GetComponent<MeshRendererComponent>().path = "assets/meshs/Cube_1m.obj";
     testentt.GetComponent<MeshRendererComponent>().UpdateMesh();
@@ -136,10 +140,13 @@ void EditorLayer::OnImGuiRender()
                     SaveSceneAs();
                 }
                 ImGui::Separator();
+                ImGui::SetNextItemWidth(150.f);
+                ImGui::DragFloat("Import Scale", &ImprotScale,0.1f);
                 if (ImGui::MenuItem("Import scene from model", "Ctrl+O"))
                 {
-                    ImportMeshes();
+                    ImportMeshes(ImprotScale);
                 }
+                ImGui::Separator();
 
                 if (ImGui::MenuItem("Exit"))
                     HEngine::Application::Get().Close();
@@ -356,11 +363,11 @@ void EditorLayer::SaveSceneAs()
     }
 }
 
-void EditorLayer::ImportMeshes()
+void EditorLayer::ImportMeshes(float scale)
 {
     std::string filepath = FileDialogs::OpenFile("Hope Scene (*.hpscene)\0*.hpscene\0");
     if (!filepath.empty())
     {
-        AssetImporter::ImportScene(filepath, m_Scene.get());
+        AssetImporter::ImportScene(filepath, m_Scene.get(),scale);
     }
 }

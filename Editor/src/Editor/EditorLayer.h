@@ -25,7 +25,7 @@ private:
     void NewScene();
     void OpenScene();
     void SaveSceneAs();
-    void ImportMeshes();
+    void ImportMeshes(float scale);
 
 private:
     Ref<HEngine::Scene> m_Scene;
@@ -41,5 +41,6 @@ private:
     uint32_t m_ViewportHeight, m_ViewportWidth;
     bool m_ViewportFocused = false, m_ViewportHovered = false;
     int m_GizmoType = -1;
+    float ImprotScale;
 
 };

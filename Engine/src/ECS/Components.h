@@ -102,12 +102,16 @@ namespace HEngine
             Ref<IndexBuffer> indexBuffer;
             indexBuffer.reset(IndexBuffer::Create(_indices.data(), _indices.size()));
             vertexArray->SetIndexBuffer(indexBuffer);
+            bEmpty = false;
         };
 
         std::string path = std::string();
         Ref<VertexArray> vertexArray;
         Ref<Material> material;
         Ref<VertexArray>& getVertexArray() { return vertexArray; };
+
+        bool bSouldRender = true;
+        bool bEmpty = true;
     private:
         std::vector<FVertex> _data;
         std::vector<uint32_t> _indices;
@@ -168,5 +172,17 @@ namespace HEngine
             }
     		//return glm::ortho(0.0f, hight, 0.0f, width, nearPlane, farPlane);
     	}
+    };
+
+    struct PointLightComponent
+    {
+        Vec4 m_Color = Vec4{ 1.0f };
+        float m_Intensity = 1.0f;
+        bool bAffectWorld = true;
+
+        PointLightComponent() = default;
+        PointLightComponent(const PointLightComponent& other) = default;
+        ~PointLightComponent() = default;
+
     };
 }

@@ -36,9 +36,29 @@ in vec3 WS_Normal;
 
 uniform vec4 u_Color;
 
+uniform vec3 u_LightPosWS; 
+uniform vec3 u_CameraPositionWS; 
+uniform vec3 u_LightColor;
+
 void main()
 {
-	float l = dot(WS_Normal,vec3(0.0f)-WS_Position);
-	color = u_Color*l;
-	//color = vec4(WS_Normal,1.0f);
+	// ambient
+    float ambientStrength = 0.1;
+    vec3 ambient = ambientStrength * u_LightColor;
+  	
+    // diffuse 
+    vec3 norm = normalize(WS_Normal);
+    vec3 lightDir = normalize(u_LightPosWS - WS_Position);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = diff * u_LightColor;
+    
+    // specular
+    float specularStrength = 0.5;
+    vec3 viewDir = normalize(u_CameraPositionWS - WS_Position);
+    vec3 reflectDir = reflect(-lightDir, norm);  
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    vec3 specular = specularStrength * spec * u_LightColor;  
+
+    vec3 result = (ambient + diffuse + specular) * u_Color.xyz;
+    color = vec4(result, 1.0);
 }

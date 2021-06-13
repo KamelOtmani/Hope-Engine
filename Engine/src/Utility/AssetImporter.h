@@ -18,7 +18,7 @@ namespace HEngine
     {
     public:
         static Model ImportModel(std::string& path);
-        static void ImportScene(std::string& path, Scene* m_scene);
+        static void ImportScene(std::string& path, Scene* m_scene, float scale = 1.0f);
 
     };
 }
