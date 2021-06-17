@@ -1,0 +1,37 @@
+Scene: Untitled Scene
+Entities:
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Cornel
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      Path: F:\source\Hope-Engine\Editor\assets\meshs\Cornel.obj
+      Material:
+        Name: DefaultMaterial
+        Color: [1, 1, 1, 1]
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Light
+    TransformComponent:
+      Position: [0, 1.39811301, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointLightComponent:
+      Color: [1, 1, 1, 1]
+      Intensity: 1
+      AffectWorld: true
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Position: [-0.437439561, 0.266000986, 0]
+      Rotation: [0, -0.545430958, 0]
+      Scale: [0.270000041, 0.270000041, 0.270000041]
+    MeshRendererComponent:
+      Path: F:\source\Hope-Engine\Editor\assets\meshs\Cube_1m.obj
+      Material:
+        Name: DefaultMaterial
+        Color: [1, 1, 1, 1]

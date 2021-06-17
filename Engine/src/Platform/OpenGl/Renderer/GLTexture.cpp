@@ -6,6 +6,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include <Core\Core.h>
 namespace HEngine
 {
 
@@ -36,7 +37,38 @@ namespace HEngine
 
     void GLTexture2D::Bind(uint32_t slot) const
     {
-
+        switch (slot)
+        {
+        case 0:
+            glActiveTexture(GL_TEXTURE0);
+            break;
+        case 1:
+            glActiveTexture(GL_TEXTURE1);
+            break;
+        case 2:
+            glActiveTexture(GL_TEXTURE2);
+            break;
+        case 3:
+            glActiveTexture(GL_TEXTURE3);
+            break;
+        case 4:
+            glActiveTexture(GL_TEXTURE4);
+            break;
+        case 6:
+            glActiveTexture(GL_TEXTURE5);
+            break;
+        case 7:
+            glActiveTexture(GL_TEXTURE6);
+            break;
+        case 8:
+            glActiveTexture(GL_TEXTURE7);
+            break;
+        case 9:
+            HASSERT(false,"Cant handle more than 8 tesxtures for now , didnt implemente them");
+        default:
+            break;
+        }
+        glBindTexture(GL_TEXTURE_2D, m_ID);
     }
 
     bool GLTexture2D::operator==(const Texture& other) const
@@ -66,6 +98,11 @@ namespace HEngine
         {
             internalFormat = GL_RGB8;
             dataFormat = GL_RGB;
+        }
+        else if (channels == 1)
+        {
+            internalFormat = GL_RED;
+            dataFormat = GL_RED;
         }
 
         m_InternalFormat = internalFormat;

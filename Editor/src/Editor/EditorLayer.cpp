@@ -22,10 +22,10 @@ void EditorLayer::OnAttach()
 
     auto testentt = m_Scene->CreateEntity("Test mesh");
     std::vector<FVertex> verts = {
-            { Vec3{-0.5f, -0.5f, 0.0f }  ,Vec3{0.0f,0.0f,1.0f }  , Vec4{1.0f}},
-            { Vec3{0.5f, -0.5f, 0.0f}    ,Vec3{0.0f,0.0f,1.0f },   Vec4{1.0f}},
-            { Vec3{0.5f, 0.5f, 0.0f}     ,Vec3{0.0f,0.0f,1.0f },   Vec4{1.0f}},
-            { Vec3{-0.5f, 0.5f, 0.0f}    ,Vec3{0.0f,0.0f,1.0f },   Vec4{1.0f}}
+            { Vec3{-0.5f, -0.5f, 0.0f }  ,Vec3{0.0f,0.0f,1.0f }, Vec2{0.0f,0.0f},  Vec4{1.0f}},
+            { Vec3{0.5f, -0.5f, 0.0f}    ,Vec3{0.0f,0.0f,1.0f }, Vec2{1.0f,0.0f},  Vec4{1.0f}},
+            { Vec3{0.5f, 0.5f, 0.0f}     ,Vec3{0.0f,0.0f,1.0f }, Vec2{1.0f,1.0f},  Vec4{1.0f}},
+            { Vec3{-0.5f, 0.5f, 0.0f}    ,Vec3{0.0f,0.0f,1.0f }, Vec2{0.0f,1.0f},  Vec4{1.0f}}
     };
     std::vector<uint32_t> indx = { 0, 1, 2, 2, 3, 0 };
     testentt.AddComponent<MeshRendererComponent>(verts, indx);
@@ -167,10 +167,10 @@ void EditorLayer::OnImGuiRender()
     auto ViewportPanelSize = ImGui::GetContentRegionAvail();
     if ((m_ViewportHeight != ViewportPanelSize.y) | (m_ViewportWidth != ViewportPanelSize.x))
     {
-        m_ViewportHeight = ViewportPanelSize.y;
-        m_ViewportWidth = ViewportPanelSize.x;
+        m_ViewportHeight = static_cast<uint32_t>(ViewportPanelSize.y);
+        m_ViewportWidth = static_cast<uint32_t>(ViewportPanelSize.x);
         m_MainFramebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
-        m_EditorCamera.SetViewportSize(m_ViewportWidth ,m_ViewportHeight);
+        m_EditorCamera.SetViewportSize((float)m_ViewportWidth, (float)m_ViewportHeight);
     }
     auto textID = m_MainFramebuffer->getColorAttachement();
     ImGui::Image((void*)textID, ViewportPanelSize, ImVec2{ 0,1 }, ImVec2{ 1,0 });
@@ -207,8 +207,9 @@ void EditorLayer::OnImGuiRender()
             snapValue = 45.0f;
 
         float snapValues[3] = { snapValue, snapValue, snapValue };
+        bool bBounds = false;
 
-        ImGuizmo::OPERATION op = ImGuizmo::TRANSLATE;
+        ImGuizmo::OPERATION op;
 
         switch (m_GizmoType)
         {
@@ -218,14 +219,20 @@ void EditorLayer::OnImGuiRender()
             op = ImGuizmo::ROTATE; break;
         case 2:
             op = ImGuizmo::SCALE; break;
+        case 3:
+            op = ImGuizmo::BOUNDS; break;
+            bBounds = true;
         default:
             break;
         }
 
+        static float bounds[] = { -0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f };
+
+        ImGuizmo::DrawGrid(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection), glm::value_ptr(Mat4(1.0f)), 10.f);
         
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-            op, ImGuizmo::LOCAL, glm::value_ptr(transform),
-            nullptr, snap ? snapValues : nullptr);
+            op, ImGuizmo::MODE::LOCAL, glm::value_ptr(transform),
+            nullptr, snap ? snapValues : nullptr, bBounds ? bounds :NULL);
 
         if (ImGuizmo::IsUsing())
         {
@@ -267,6 +274,40 @@ void EditorLayer::OnImGuiRender()
                 mat->name = std::string(buffer);
             }
             ImGui::ColorEdit4("Color", glm::value_ptr(mat->Color));
+            ImGui::DragFloat("SpecularPower", &mat->SpecularPower);
+            {
+                ImGui::Text("Diffuse Texture");
+                ImGui::SameLine();
+                if (mat->m_AlbedoTexture)
+                {
+                    ImGui::Text("ID = %d",mat->m_AlbedoTexture->getID());
+                }
+                ImGui::PushID(45);
+                if (ImGui::Button("..."))
+                {
+                    auto& path = FileDialogs::OpenFile("PNG (*.png)\0*.png\0");
+                    if (!path.empty())
+                        mat->m_AlbedoTexture = Texture2D::Create(path);
+                }
+                ImGui::PopID();
+            }
+            {
+                ImGui::Text("Specular Texture");
+                ImGui::SameLine();
+                if (mat->m_SpecularTexture)
+                {
+                    ImGui::Text("ID = %d",mat->m_SpecularTexture->getID());
+                }
+                ImGui::PushID(48);
+                if (ImGui::Button("..."))
+                {
+                    auto& path = FileDialogs::OpenFile("PNG (*.png)\0*.png\0");
+                    if (!path.empty())
+                        mat->m_SpecularTexture = Texture2D::Create(path);
+                }
+                ImGui::PopID();
+            }
+
             ImGui::TreePop();
         }
     }
@@ -315,7 +356,8 @@ bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
     }
     case Key::Space:
     {
-        m_GizmoType = (m_GizmoType + 1)%3;
+        m_GizmoType = (m_GizmoType + 1)%4;
+        HLOG("Type = {0}", m_GizmoType);
         break;
     }
     case Key::Q:
@@ -332,6 +374,7 @@ bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
         break;
     }
     }
+    return true;
 }
 
 void EditorLayer::NewScene()

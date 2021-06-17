@@ -38,7 +38,8 @@ namespace HEngine {
 		glDeleteProgram(m_RendererID);
 	}
 
-	std::string Shader::readFile(const std::string& filepath)
+
+    std::string Shader::readFile(const std::string& filepath)
 	{
 		std::string result;
 		std::ifstream in(filepath, std::ios::in, std::ios::binary);
@@ -161,12 +162,23 @@ namespace HEngine {
 		glUseProgram(0);
 	}
 
+
+    void Shader::SetBool(const std::string& name, bool value)
+    {
+		UploadUniformBool(name, value);
+    }
+
 	void Shader::SetInt(const std::string& name, int value)
 	{
 		UploadUniformInt(name, value);
 	}
 
-	void Shader::SetFloat3(const std::string& name, const Vec3& value)
+    void Shader::SetFloat(const std::string& name, const float value)
+    {
+		UploadUniformFloat(name, value);
+    }
+
+    void Shader::SetFloat3(const std::string& name, const Vec3& value)
 	{
 		UploadUniformFloat3(name, value);
 	}
@@ -179,9 +191,15 @@ namespace HEngine {
 	void Shader::SetMat4(const std::string& name, const Mat4& value)
 	{
 		UploadUniformMat4(name, value);
-	}
+    }
 
-	void Shader::UploadUniformInt(const std::string& name, int value)
+    void Shader::UploadUniformBool(const std::string& name, bool value)
+    {
+        GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+        glUniform1i(location, (int)value);
+    }
+
+    void Shader::UploadUniformInt(const std::string& name, int value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform1i(location, value);

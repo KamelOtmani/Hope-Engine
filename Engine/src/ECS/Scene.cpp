@@ -18,15 +18,15 @@ namespace HEngine
         m_DefaultMaterial->shader = CreateRef<HEngine::Shader>("assets/shaders/DefaultShader.glsl");
 
         std::vector<FVertex> verts = {
-            { Vec3{-0.5f, -0.5f, 0.0f }  ,Vec3{0.0f,0.0f,1.0f }  , Vec4{1.0f}},
-            { Vec3{0.5f, -0.5f, 0.0f}    ,Vec3{0.0f,0.0f,1.0f },   Vec4{1.0f}},
-            { Vec3{0.5f, 0.5f, 0.0f}     ,Vec3{0.0f,0.0f,1.0f },   Vec4{1.0f}},
-            { Vec3{-0.5f, 0.5f, 0.0f}    ,Vec3{0.0f,0.0f,1.0f },   Vec4{1.0f}},
+            { Vec3{-0.5f, -0.5f, 0.0f }  ,Vec3{0.0f,0.0f,1.0f }, Vec2{0.0f,0.0f},  Vec4{1.0f}},
+            { Vec3{0.5f, -0.5f, 0.0f}    ,Vec3{0.0f,0.0f,1.0f }, Vec2{1.0f,0.0f},  Vec4{1.0f}},
+            { Vec3{0.5f, 0.5f, 0.0f}     ,Vec3{0.0f,0.0f,1.0f }, Vec2{1.0f,1.0f},  Vec4{1.0f}},
+            { Vec3{-0.5f, 0.5f, 0.0f}    ,Vec3{0.0f,0.0f,1.0f }, Vec2{0.0f,1.0f},  Vec4{1.0f}},
         };
         std::vector<uint32_t> indx = { 0, 1, 2, 2, 3, 0 };
         m_QuadVAO.reset(VertexArray::Create());
         Ref<VertexBuffer> vertexBuffer;
-        vertexBuffer.reset(VertexBuffer::Create(verts, verts.size() * (sizeof(Vec3)+ sizeof(Vec3) + sizeof(Vec4))));
+        vertexBuffer.reset(VertexBuffer::Create(verts, verts.size() * static_cast<uint32_t>(sizeof(Vec3)+ sizeof(Vec3) + sizeof(Vec4))));
         BufferLayout layout = {
             { ShaderDataType::Float3, "a_Position" },
             { ShaderDataType::Float3, "a_Normal" },
@@ -36,7 +36,7 @@ namespace HEngine
         m_QuadVAO->AddVertexBuffer(vertexBuffer);
 
         Ref<IndexBuffer> indexBuffer;
-        indexBuffer.reset(IndexBuffer::Create(indx.data(), indx.size()));
+        indexBuffer.reset(IndexBuffer::Create(indx.data(), static_cast<uint32_t>(indx.size())));
         m_QuadVAO->SetIndexBuffer(indexBuffer);
 
 
@@ -49,16 +49,25 @@ namespace HEngine
 
     void Scene::Initialize()
     {
-        auto view = m_Registry.view<MeshRendererComponent>();
-        for (auto entity : view)
-        {
-            auto& mesh = view.get<MeshRendererComponent>(entity);
-            // setup meshes
-        }
+
     }
 
     void Scene::setupScene()
     {
+    }
+
+    void Scene::UpdateLightsInfo()
+    {
+        PointLightList.clear();
+        auto view = m_Registry.view<PointLightComponent,TransformComponent>();
+        for (auto& entt : view)
+        {
+            auto [tc,light] = view.get<TransformComponent, PointLightComponent>(entt);
+            if (light.bAffectWorld)
+            {
+                PointLightList.push_back({ tc.Position,light.m_Color * light.m_Intensity });
+            }
+        }
     }
 
     Entity Scene::CreateEntity(const std::string& name /*= std::string() */)

@@ -20,12 +20,15 @@ namespace HEngine {
 		Shader(const std::string& filepath);
 		~Shader();
 
-		
-		virtual void SetInt(const std::string& name, int value) ;
+
+        virtual void SetBool(const std::string& name, bool value);
+        virtual void SetInt(const std::string& name, int value);
+        virtual void SetFloat(const std::string& name, const float value);
 		virtual void SetFloat3(const std::string& name, const Vec3& value);
 		virtual void SetFloat4(const std::string& name, const Vec4& value) ;
 		virtual void SetMat4(const std::string& name, const Mat4& value) ;
 
+        void UploadUniformBool(const std::string& name, bool value);
 		void UploadUniformInt(const std::string& name, int value);
 
 		void UploadUniformFloat(const std::string& name, float value);

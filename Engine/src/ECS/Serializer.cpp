@@ -158,6 +158,17 @@ namespace HEngine {
             out << YAML::EndMap; // MeshRendererComponenet
         }
 
+        if (entity.HasComponent<PointLightComponent>())
+        {
+            out << YAML::Key << "PointLightComponent";
+            auto& light = entity.GetComponent<PointLightComponent>();
+            out << YAML::BeginMap; // PointLightComponent
+            out << YAML::Key << "Color" << YAML::Value << light.m_Color;
+            out << YAML::Key << "Intensity" << YAML::Value << light.m_Intensity;
+            out << YAML::Key << "AffectWorld" << YAML::Value << light.bAffectWorld;
+            out << YAML::EndMap; // PointLightComponent
+        }
+
 
         out << YAML::EndMap; // Entity
 
@@ -281,6 +292,14 @@ namespace HEngine {
                     }
                 }
 
+                auto pointLightComponent = entity["PointLightComponent"];
+                if (pointLightComponent)
+                {
+                    auto& lc = deserializedEntity.AddComponent<PointLightComponent>();
+                    lc.m_Color = pointLightComponent["Color"].as<Vec4>();
+                    lc.m_Intensity = pointLightComponent["Intensity"].as<float>();
+                    lc.bAffectWorld = pointLightComponent["AffectWorld"].as<bool>();
+                }
 
             }
         }

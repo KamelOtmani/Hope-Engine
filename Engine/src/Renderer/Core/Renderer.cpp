@@ -19,6 +19,7 @@ namespace HEngine {
 		//HLOG("Preparing scene");
 		RHICommand::SetClearColor(Vec4(0.1, 0.1, 0.5, 1));
 		RHICommand::Clear();
+		scene->UpdateLightsInfo();
 	}
 	void Renderer::SubmitScene(Scene* scene,EditorCamera& camera)
 	{
@@ -28,20 +29,6 @@ namespace HEngine {
         Vec4 LightColor = Vec4{ 1.0f };
 		float LightIntensity = 1.0f;
 
-		// LIGHTS
-        {
-            auto group = scene->m_Registry.group<TransformComponent>(entt::get<PointLightComponent>);
-            for (auto entity : group)
-            {
-                auto [xform, light] = group.get<TransformComponent, PointLightComponent>(entity);
-                if (light.bAffectWorld)
-                {
-					lightPos = xform.Position;
-					LightIntensity = light.m_Intensity;
-					LightColor = light.m_Color;
-                }
-            }
-        }
 
 		{
 			auto group = scene->m_Registry.view<TransformComponent,MeshRendererComponent>();
@@ -52,10 +39,17 @@ namespace HEngine {
 				{
 					if (mesh.material->shader != nullptr)
 					{
+
 						mesh.material->shader->Bind();
+                        mesh.material->shader->SetInt("u_num_point_light", static_cast<int>(scene->PointLightList.size()));
+						int i = 0;
+						for (auto& pointlight : scene->PointLightList)
+						{
+							mesh.material->shader->SetFloat3("u_PointLights[" + std::to_string(i) + "].position", pointlight.Position);
+                            mesh.material->shader->SetFloat4("u_PointLights[" + std::to_string(i) + "].color", pointlight.Color);
+							i++;
+						}
                         mesh.material->shader->SetFloat3("u_CameraPositionWS", camera.GetPosition());
-                        mesh.material->shader->SetFloat3("u_LightPosWS", lightPos);
-                        mesh.material->shader->SetFloat3("u_LightColor", LightColor*LightIntensity);
 						mesh.material->shader->SetMat4("u_Transform", xform.Matrix());
 						mesh.material->shader->SetMat4("u_ViewProjection", ViewProjectionMatrix);
 						mesh.material->ApplyMaterial();

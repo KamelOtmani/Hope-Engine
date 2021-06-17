@@ -34,6 +34,15 @@ namespace HEngine
                 vertex.Normal = normal;
                 }
 
+                if (mesh->HasTextureCoords(0))
+                {
+                    Vec2 Coord; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
+// positions
+                    Coord.x = mesh->mTextureCoords[0][i].x;
+                    Coord.y = mesh->mTextureCoords[0][i].y;
+                    vertex.TexCoord = Coord;
+                }
+
                 vertices.push_back(vertex);
             }
             // now walk through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.

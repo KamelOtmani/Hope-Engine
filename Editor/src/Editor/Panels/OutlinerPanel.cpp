@@ -217,6 +217,15 @@ void OutlinerPanel::DrawComponents(HEngine::Entity entity)
                 ImGui::CloseCurrentPopup();
             }
         }
+        if (!m_SelectionContext.HasComponent<PointLightComponent>())
+        {
+            if (ImGui::MenuItem("Point Light Component"))
+            {
+
+                m_SelectionContext.AddComponent<PointLightComponent>();
+                ImGui::CloseCurrentPopup();
+            }
+        }
 
         ImGui::EndPopup();
     }
@@ -305,6 +314,14 @@ void OutlinerPanel::DrawComponents(HEngine::Entity entity)
         {
             auto& sprite = component;
             ImGui::ColorEdit4("Color", glm::value_ptr(sprite.m_Color));
+        });
+
+    DrawComponent<PointLightComponent>("Point Light Component", entity, [](auto& component)
+        {
+            auto& light = component;
+            ImGui::DragFloat("Intensity", &light.m_Intensity);
+            ImGui::ColorEdit4("Color", glm::value_ptr(light.m_Color));
+            ImGui::Checkbox("Affect World", &light.bAffectWorld);
         });
 
     DrawComponent<MeshRendererComponent>("Mesh Renderer Component", entity, [this](auto& component)

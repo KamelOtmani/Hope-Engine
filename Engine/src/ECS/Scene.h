@@ -19,6 +19,7 @@ namespace HEngine {
         void Initialize();
 
         void setupScene();
+        void UpdateLightsInfo();
 
         Entity CreateEntity(const std::string& name = std::string());
         void DestroyEntity(Entity entity);
@@ -30,6 +31,14 @@ namespace HEngine {
         Ref<Shader> m_DefaultShader;
         Ref<HEngine::Texture2D> m_DefaultTexture;
         Ref<HEngine::Material> m_DefaultMaterial;
+        
+        struct PointLight 
+        {
+            Vec3 Position;
+            Vec4 Color;
+        };
+
+        Vector<PointLight> PointLightList;
     private:
 
         friend class Entity;

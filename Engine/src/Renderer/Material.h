@@ -4,9 +4,11 @@
 #include "Renderer/Shader.h"
 #include <string>
 
-class Shader;
 
 namespace HEngine {
+
+    class Shader;
+    class Texture2D;
 
     class Material
     {
@@ -18,6 +20,11 @@ namespace HEngine {
         void ApplyMaterial();
 
         Vec4 Color{ 1.0f };
+        float SpecularPower{ 16.0f };
+
+        Ref<HEngine::Texture2D> m_AlbedoTexture;
+        Ref<HEngine::Texture2D> m_SpecularTexture;
+
         Ref<HEngine::Shader> shader;
         std::string name = "unnamed material";
     };

@@ -10,6 +10,10 @@
 
 #include "Utility/AssetImporter.h"
 
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
 namespace HEngine
 {
     struct TagComponent
@@ -33,27 +37,9 @@ namespace HEngine
         TransformComponent(const Vec3& pos, const Vec3& rot, const Vec3& scale)
             : Position(pos), Rotation(rot), Scale(scale) {}
 
-        Mat4 Matrix () {
-            return glm::translate(glm::mat4(1.0f), Position) *
-                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)) *
-                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
-                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)) *
-                glm::scale(glm::mat4(1.0f), Scale);
-        }
-
-        operator Mat4&() {
-            return glm::translate(glm::mat4(1.0f), Position) *
-                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)) *
-                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
-                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)) *
-                glm::scale(glm::mat4(1.0f), Scale);
-        }
-        operator const Mat4& () const
-        {
-            return glm::translate(glm::mat4(1.0f), Position) *
-                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)) *
-                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
-                glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)) *
+        Mat4 Matrix() {
+            glm::mat4 rotation = glm::toMat4(glm::quat(Rotation));
+            return glm::translate(glm::mat4(1.0f), Position) * rotation *
                 glm::scale(glm::mat4(1.0f), Scale);
         }
     };
@@ -67,17 +53,18 @@ namespace HEngine
             _indices = indices;
             vertexArray.reset(VertexArray::Create());
             Ref<VertexBuffer> vertexBuffer;
-            vertexBuffer.reset(VertexBuffer::Create(vertices, vertices.size() * (sizeof(Vec3) + sizeof(Vec3)+ sizeof(Vec4))));
+            vertexBuffer.reset(VertexBuffer::Create(vertices, vertices.size() * static_cast<uint32_t>(sizeof(Vec3)+ sizeof(Vec3) + sizeof(Vec2)+ sizeof(Vec4))));
             BufferLayout layout = {
                 { ShaderDataType::Float3, "a_Position" },
                 { ShaderDataType::Float3, "a_Normal" },
+                { ShaderDataType::Float2, "a_TexCoord" },
                 { ShaderDataType::Float4, "a_Color" }
             };
             vertexBuffer->SetLayout(layout);
             vertexArray->AddVertexBuffer(vertexBuffer);
 
             Ref<IndexBuffer> indexBuffer;
-            indexBuffer.reset(IndexBuffer::Create(indices.data(), indices.size()));
+            indexBuffer.reset(IndexBuffer::Create(indices.data(), static_cast<uint32_t>(indices.size())));
             vertexArray->SetIndexBuffer(indexBuffer);
         }
         ~MeshRendererComponent() = default;
@@ -90,17 +77,18 @@ namespace HEngine
 
             vertexArray.reset(VertexArray::Create());
             Ref<VertexBuffer> vertexBuffer;
-            vertexBuffer.reset(VertexBuffer::Create(_data, _data.size() * (sizeof(Vec3) + sizeof(Vec3) + sizeof(Vec4))));
+            vertexBuffer.reset(VertexBuffer::Create(_data, _data.size() * static_cast<uint32_t>(sizeof(Vec3) + sizeof(Vec3) + sizeof(Vec2) + sizeof(Vec4))));
             BufferLayout layout = {
                 { ShaderDataType::Float3, "a_Position" },
                 { ShaderDataType::Float3, "a_Normal" },
+                { ShaderDataType::Float2, "a_TexCoord" },
                 { ShaderDataType::Float4, "a_Color" }
             };
             vertexBuffer->SetLayout(layout);
             vertexArray->AddVertexBuffer(vertexBuffer);
 
             Ref<IndexBuffer> indexBuffer;
-            indexBuffer.reset(IndexBuffer::Create(_indices.data(), _indices.size()));
+            indexBuffer.reset(IndexBuffer::Create(_indices.data(), static_cast<uint32_t>(_indices.size())));
             vertexArray->SetIndexBuffer(indexBuffer);
             bEmpty = false;
         };
