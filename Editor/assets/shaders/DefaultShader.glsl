@@ -70,18 +70,19 @@ uniform int u_num_point_light;
 vec3 CalculatePointLight(PointLight Light, vec3 NormalWS ,vec3 PositionWS, vec3 ViewDir)
 {
     vec3 LightDir = normalize(Light.position - PositionWS);
+    vec3 HalfwayDir = normalize(LightDir + ViewDir);
 
     vec3 Diffuse = vec3(max(dot(NormalWS, LightDir),0.0));
     Diffuse *= u_Material.hasAlbedoTexture ? texture(u_Material.AlbedoTexture, v_TexCoord).xyz : vec3(1.0);
     
     // Specular component
     vec3 RelcetionDir = reflect(-LightDir,NormalWS);
-    vec3 Specular = vec3(pow(max(dot(ViewDir,RelcetionDir),0.0),u_Material.SpecularPower));
+    vec3 Specular = vec3(pow(max(dot(NormalWS,HalfwayDir),0.0),u_Material.SpecularPower));
     Specular *= u_Material.hasSpecularTexture ? texture(u_Material.SpecularTexture, v_TexCoord).xyz : vec3(1.0);
 
     // atenuation
     float Distance = length(Light.position - PositionWS);
-    float Attenuation = 1.0 / (CONSTANT + LINEAR * Distance + QUAD * (Distance * Distance));
+    float Attenuation = 1.0 / (Distance * Distance);
 
     return (Attenuation * (Diffuse + Specular).xyz * Light.color.xyz );
 }
@@ -92,12 +93,13 @@ void main()
     vec3 Normal = normalize(WS_Normal);
     vec3 viewDir = normalize(u_CameraPositionWS - WS_Position);
 
-    vec3 Lighting = vec3(0.05);
+    vec3 Lighting = vec3(0.00);
     for(int i = 0; i < u_num_point_light; i++)
             Lighting += CalculatePointLight(u_PointLights[i], Normal, WS_Position, viewDir);    
 
     vec3 result = Lighting * u_Material.Color.xyz;
-    color = vec4(result,1.0);
+    vec3 GammaCorrected = pow(result,vec3(1/2.2));
+    color = vec4(GammaCorrected,1.0);
 
     float lum = 0.3 * result.x + 0.59 * result.y + 0.11 * result.z;
     if (lum > 0.8)

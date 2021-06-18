@@ -53,7 +53,7 @@ namespace HEngine
             _indices = indices;
             vertexArray.reset(VertexArray::Create());
             Ref<VertexBuffer> vertexBuffer;
-            vertexBuffer.reset(VertexBuffer::Create(vertices, vertices.size() * static_cast<uint32_t>(sizeof(Vec3)+ sizeof(Vec3) + sizeof(Vec2)+ sizeof(Vec4))));
+            vertexBuffer.reset(VertexBuffer::Create(vertices, static_cast<uint32_t>(vertices.size() * sizeof(Vec3)+ sizeof(Vec3) + sizeof(Vec2)+ sizeof(Vec4))));
             BufferLayout layout = {
                 { ShaderDataType::Float3, "a_Position" },
                 { ShaderDataType::Float3, "a_Normal" },

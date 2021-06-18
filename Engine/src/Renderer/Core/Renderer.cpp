@@ -32,7 +32,7 @@ namespace HEngine {
 
 		{
 			auto group = scene->m_Registry.view<TransformComponent,MeshRendererComponent>();
-			for (auto entity : group)
+			for (auto& entity : group)
 			{
 				auto [xform, mesh] = group.get<TransformComponent, MeshRendererComponent>(entity);
 				if (!mesh.bEmpty && mesh.bSouldRender)
