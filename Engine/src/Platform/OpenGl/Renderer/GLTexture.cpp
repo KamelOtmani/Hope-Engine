@@ -37,37 +37,7 @@ namespace HEngine
 
     void GLTexture2D::Bind(uint32_t slot) const
     {
-        switch (slot)
-        {
-        case 0:
-            glActiveTexture(GL_TEXTURE0);
-            break;
-        case 1:
-            glActiveTexture(GL_TEXTURE1);
-            break;
-        case 2:
-            glActiveTexture(GL_TEXTURE2);
-            break;
-        case 3:
-            glActiveTexture(GL_TEXTURE3);
-            break;
-        case 4:
-            glActiveTexture(GL_TEXTURE4);
-            break;
-        case 6:
-            glActiveTexture(GL_TEXTURE5);
-            break;
-        case 7:
-            glActiveTexture(GL_TEXTURE6);
-            break;
-        case 8:
-            glActiveTexture(GL_TEXTURE7);
-            break;
-        case 9:
-            HASSERT(false,"Cant handle more than 8 tesxtures for now , didnt implemente them");
-        default:
-            break;
-        }
+        glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, m_ID);
     }
 

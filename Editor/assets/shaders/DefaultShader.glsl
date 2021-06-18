@@ -37,6 +37,7 @@ void main()
 #define QUAD 2.0
 			
 layout(location = 0) out vec4 color;
+layout(location = 1) out vec4 bloom;
 
 in vec3 v_Position;
 in vec4 v_Color;
@@ -97,6 +98,12 @@ void main()
 
     vec3 result = Lighting * u_Material.Color.xyz;
     color = vec4(result,1.0);
+
+    float lum = 0.3 * result.x + 0.59 * result.y + 0.11 * result.z;
+    if (lum > 0.8)
+    {
+        bloom = vec4(result,1.0);
+    }
 }
 
 

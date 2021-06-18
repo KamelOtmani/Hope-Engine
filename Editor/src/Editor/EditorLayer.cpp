@@ -46,6 +46,7 @@ void EditorLayer::OnAttach()
     HEngine::FramebufferSpecification fbspec;
     fbspec.width = 1600;
     fbspec.height = 900;
+    fbspec.Attachements = { FBTextureFormat::RGBA8,FBTextureFormat::RGBA8,FBTextureFormat::Depth };
 
     m_MainFramebuffer = HEngine::Framebuffer::Create(fbspec);
     HEngine::Renderer::Initialise();
@@ -172,7 +173,7 @@ void EditorLayer::OnImGuiRender()
         m_MainFramebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
         m_EditorCamera.SetViewportSize((float)m_ViewportWidth, (float)m_ViewportHeight);
     }
-    auto textID = m_MainFramebuffer->getColorAttachement();
+    auto textID = m_MainFramebuffer->getColorAttachement(0);
     ImGui::Image((void*)textID, ViewportPanelSize, ImVec2{ 0,1 }, ImVec2{ 1,0 });
 
     // GUIZMOS

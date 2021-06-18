@@ -57,3 +57,5 @@ constexpr Ref<T> CreateRef(Args&& ... args)
 
 template<typename T>
 using Vector = std::vector<T>;
+
+#include "Log.h"
