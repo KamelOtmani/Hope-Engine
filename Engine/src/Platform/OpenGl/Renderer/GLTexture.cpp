@@ -7,22 +7,23 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <Core\Core.h>
+
+#include "Platform/OpenGl/GLUtility.h"
+
 namespace HEngine
 {
+    
 
-    GLTexture2D::GLTexture2D(uint32_t width, uint32_t height)
+    
+
+    GLTexture2D::GLTexture2D(TextureSpecefication spec)
     {
-        m_InternalFormat = GL_RGBA8;
-        m_DataFormat = GL_RGBA;
+        textureSpec = spec;
+
+        auto& [m_InternalFormat , m_DataFormat ] = Utils::HopeFormatToOpenGL(spec.format);
 
         glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);
-        glTextureStorage2D(m_ID, 1, m_InternalFormat, m_Width, m_Height);
-
-        glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        glTextureParameteri(m_ID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTextureParameteri(m_ID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        Invalidate();
     }
 
     GLTexture2D::~GLTexture2D()
@@ -32,7 +33,25 @@ namespace HEngine
 
     void GLTexture2D::setData(void* data, uint32_t size) const
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_Width, m_Height, 0, GL_RGB, GL_FLOAT, data);
+        auto& [m_InternalFormat, m_DataFormat] = Utils::HopeFormatToOpenGL(textureSpec.format);
+        auto type = Utils::HopeElementTypeToOpenGL(textureSpec.format);
+        glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, textureSpec.width, textureSpec.height, 0, m_DataFormat, GL_FLOAT, data);
+    }
+
+    void GLTexture2D::UpdateSpecification() const
+    {
+
+        glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, Utils::HopeFilterToOpenGL(textureSpec.minificationFilterType,textureSpec.bMipMaps));
+        glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, Utils::HopeFilterToOpenGL(textureSpec.magnificationFilterType, textureSpec.bMipMaps));
+
+        glTextureParameteri(m_ID, GL_TEXTURE_WRAP_S, Utils::HopeWrapToOpenGL(textureSpec.wrapType));
+        glTextureParameteri(m_ID, GL_TEXTURE_WRAP_T, Utils::HopeWrapToOpenGL(textureSpec.wrapType));
+    }
+
+    void GLTexture2D::Invalidate() const
+    {
+        glTextureStorage2D(m_ID, textureSpec.bMipMaps ? textureSpec.mipLevels : 1, m_InternalFormat, textureSpec.width, textureSpec.height);
+        UpdateSpecification();
     }
 
     void GLTexture2D::Bind(uint32_t slot) const
@@ -46,50 +65,110 @@ namespace HEngine
         return m_ID == ((GLTexture2D&)other).getID();
     }
 
-    GLTexture2D::GLTexture2D(std::string path)
+    GLTexture2D::GLTexture2D(std::string path,bool bHDR)      
     {
         int width, height, channels;
         stbi_set_flip_vertically_on_load(0);
-        stbi_uc* data = nullptr;
-        {
-            data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-        }
-        HASSERT(data, "Failed to load image!");
-        m_Width = width;
-        m_Height = height;
-
+        void* data = nullptr;
         GLenum internalFormat = 0, dataFormat = 0;
-        if (channels == 4)
+        if (bHDR)
         {
-            internalFormat = GL_RGBA8;
-            dataFormat = GL_RGBA;
-        }
-        else if (channels == 3)
-        {
-            internalFormat = GL_RGB8;
-            dataFormat = GL_RGB;
-        }
-        else if (channels == 1)
-        {
-            internalFormat = GL_RED;
-            dataFormat = GL_RED;
-        }
+            {
+                data = stbi_loadf(path.c_str(), &width, &height, &channels, 0);
+            }
+            HASSERT(data, "Failed to load image!");
+            textureSpec.width = width;
+            textureSpec.height = height;
 
+            switch (channels)
+            {
+            case 4:
+            {
+                textureSpec.format = TEXTURE_FORMAT::RGBA16F;
+                internalFormat = GL_RGBA16F;
+                dataFormat = GL_RGBA;
+                break;
+            }
+            case 3:
+            {
+                textureSpec.format = TEXTURE_FORMAT::RGB16F;
+                internalFormat = GL_RGB16F;
+                dataFormat = GL_RGB;
+                break;
+            }
+            case 2:
+            {
+                textureSpec.format = TEXTURE_FORMAT::RG16F;
+                internalFormat = GL_RG16F;
+                dataFormat = GL_RG;
+                break;
+            }
+            case 1:
+            {
+                textureSpec.format = TEXTURE_FORMAT::R16F;
+                internalFormat = GL_R16F;
+                dataFormat = GL_RED;
+                break;
+            }
+            default:
+                break;
+            }
+
+        }
+        else
+        {
+            {
+                data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+            }
+            HASSERT(data, "Failed to load image!");
+            textureSpec.width = width;
+            textureSpec.height = height;
+
+            switch (channels)
+            {
+            case 4:
+            {
+                textureSpec.format = TEXTURE_FORMAT::RGBA16F;
+                internalFormat = GL_RGBA16F;
+                dataFormat = GL_RGBA;
+                break;
+            }
+            case 3:
+            {
+                textureSpec.format = TEXTURE_FORMAT::RGB16F;
+                internalFormat = GL_RGB16F;
+                dataFormat = GL_RGB;
+                break;
+            }
+            case 2:
+            {
+                textureSpec.format = TEXTURE_FORMAT::RG16F;
+                internalFormat = GL_RG16F;
+                dataFormat = GL_RG;
+                break;
+            }
+            case 1:
+            {
+                textureSpec.format = TEXTURE_FORMAT::R16F;
+                internalFormat = GL_R16F;
+                dataFormat = GL_RED;
+                break;
+            }
+            default:
+                break;
+            }
+
+        }
         m_InternalFormat = internalFormat;
         m_DataFormat = dataFormat;
 
         HASSERT(internalFormat & dataFormat, "Format not supported!");
 
         glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);
-        glTextureStorage2D(m_ID, 1, internalFormat, m_Width, m_Height);
+        glTextureStorage2D(m_ID, 1, internalFormat, textureSpec.width, textureSpec.height);
 
-        glTextureParameteri(m_ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameteri(m_ID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        glTextureParameteri(m_ID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTextureParameteri(m_ID, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-        glTextureSubImage2D(m_ID, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
+        UpdateSpecification();
+        glTextureSubImage2D(m_ID, 0, 0, 0, textureSpec.width, textureSpec.height, dataFormat, GL_UNSIGNED_BYTE, data);
 
         stbi_image_free(data);
     }
