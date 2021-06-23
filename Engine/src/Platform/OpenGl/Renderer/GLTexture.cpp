@@ -32,7 +32,7 @@ namespace HEngine
 
     void GLTexture2D::setData(void* data, uint32_t size) const
     {
-        
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_Width, m_Height, 0, GL_RGB, GL_FLOAT, data);
     }
 
     void GLTexture2D::Bind(uint32_t slot) const

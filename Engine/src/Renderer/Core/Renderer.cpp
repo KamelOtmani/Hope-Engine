@@ -17,7 +17,7 @@ namespace HEngine {
 	void Renderer::PrepareScene(Scene* scene)
 	{
 		//HLOG("Preparing scene");
-		RHICommand::SetClearColor(Vec4(0.1, 0.1, 0.5, 1));
+		RHICommand::SetClearColor(Vec4(0.0, 0.0, 0.0, 1));
 		RHICommand::Clear();
 		scene->UpdateLightsInfo();
 	}
@@ -51,7 +51,9 @@ namespace HEngine {
 						}
                         mesh.material->shader->SetFloat3("u_CameraPositionWS", camera.GetPosition());
 						mesh.material->shader->SetMat4("u_Transform", xform.Matrix());
-						mesh.material->shader->SetMat4("u_ViewProjection", ViewProjectionMatrix);
+                        mesh.material->shader->SetMat4("u_ViewProjection", ViewProjectionMatrix);
+                        mesh.material->shader->SetMat4("u_View", camera.GetViewMatrix());
+                        mesh.material->shader->SetMat4("u_Projection", camera.GetProjectionMatrix());
 						mesh.material->ApplyMaterial();
 					}
 					mesh.vertexArray->Bind();
@@ -70,7 +72,9 @@ namespace HEngine {
 				sprite.m_Shader->Bind();
                 sprite.m_Shader->SetFloat4("u_Color", sprite.m_Color);
                 sprite.m_Shader->SetMat4("u_Transform", xform.Matrix());
-				sprite.m_Shader->SetMat4("u_ViewProjection", ViewProjectionMatrix);
+                sprite.m_Shader->SetMat4("u_ViewProjection", ViewProjectionMatrix);
+                sprite.m_Shader->SetMat4("u_View", camera.GetViewMatrix());
+                sprite.m_Shader->SetMat4("u_Projection", camera.GetProjectionMatrix());
             }
 			else if (scene->m_DefaultShader)
 			{
@@ -78,6 +82,8 @@ namespace HEngine {
                 scene->m_DefaultShader->SetFloat4("u_Color", sprite.m_Color);
                 scene->m_DefaultShader->SetMat4("u_Transform", xform.Matrix());
                 scene->m_DefaultShader->SetMat4("u_ViewProjection", ViewProjectionMatrix);
+                scene->m_DefaultShader->SetMat4("u_View", camera.GetViewMatrix());
+                scene->m_DefaultShader->SetMat4("u_Projection", camera.GetProjectionMatrix());
 			}
 			scene->m_QuadVAO->Bind();
             RHICommand::DrawIndexed(scene->m_QuadVAO);

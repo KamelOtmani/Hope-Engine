@@ -42,26 +42,17 @@ void EditorLayer::OnAttach()
     testentt.GetComponent<MeshRendererComponent>().material = m_Scene->m_DefaultMaterial;
     testentt.GetComponent<MeshRendererComponent>().path = "assets/meshs/Cube_1m.obj";
     testentt.GetComponent<MeshRendererComponent>().UpdateMesh();
-
-    HEngine::FramebufferSpecification fbspec;
-    fbspec.width = 1600;
-    fbspec.height = 900;
-    fbspec.Attachements = { FBTextureFormat::RGBA8,FBTextureFormat::RGBA8,FBTextureFormat::Depth };
-
-    m_MainFramebuffer = HEngine::Framebuffer::Create(fbspec);
-    HEngine::Renderer::Initialise();
+    m_EditorCamera.SetViewportSize(1600, 900);
+    m_SceneRenderer.Initialize();
+    m_SceneRenderer.m_Scene = m_Scene;
 }
 
 void EditorLayer::OnUpdate(float dt)
 {
     // Update the camera  
     m_EditorCamera.OnUpdate(dt);
-
-    // bind the frame buffer for rendering
-    m_MainFramebuffer->Bind();
-    HEngine::Renderer::PrepareScene(m_Scene.get());
-    HEngine::Renderer::SubmitScene(m_Scene.get(), m_EditorCamera);
-    m_MainFramebuffer->UnBind();
+    m_SceneRenderer.m_Scene = m_Scene;
+    m_SceneRenderer.Update(m_EditorCamera,dt);
 }
 void EditorLayer::OnImGuiRender()
 {
@@ -125,12 +116,12 @@ void EditorLayer::OnImGuiRender()
                 // which we can't undo at the moment without finer window depth/z control.
                 //ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 
-                if (ImGui::MenuItem("New Scene","Ctrl+N"))
+                if (ImGui::MenuItem("New Scene", "Ctrl+N"))
                 {
                     NewScene();
                 }
 
-                if (ImGui::MenuItem("Open Scene","Ctrl+O"))
+                if (ImGui::MenuItem("Open Scene", "Ctrl+O"))
                 {
                     OpenScene();
                 }
@@ -142,7 +133,7 @@ void EditorLayer::OnImGuiRender()
                 }
                 ImGui::Separator();
                 ImGui::SetNextItemWidth(150.f);
-                ImGui::DragFloat("Import Scale", &ImprotScale,0.1f);
+                ImGui::DragFloat("Import Scale", &ImprotScale, 0.1f);
                 if (ImGui::MenuItem("Import scene from model", "Ctrl+O"))
                 {
                     ImportMeshes(ImprotScale);
@@ -170,10 +161,11 @@ void EditorLayer::OnImGuiRender()
     {
         m_ViewportHeight = static_cast<uint32_t>(ViewportPanelSize.y);
         m_ViewportWidth = static_cast<uint32_t>(ViewportPanelSize.x);
-        m_MainFramebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+        //m_MainFramebuffer->Resize(m_ViewportWidth, m_ViewportHeight);
+        m_SceneRenderer.OnViewportResize(m_ViewportWidth, m_ViewportHeight);
         m_EditorCamera.SetViewportSize((float)m_ViewportWidth, (float)m_ViewportHeight);
     }
-    auto textID = m_MainFramebuffer->getColorAttachement(0);
+    auto textID = m_SceneRenderer.getOutputTextureID();
     ImGui::Image((void*)textID, ViewportPanelSize, ImVec2{ 0,1 }, ImVec2{ 1,0 });
 
     // GUIZMOS
@@ -185,7 +177,7 @@ void EditorLayer::OnImGuiRender()
         ImGuizmo::SetDrawlist();
         float windowWidth = (float)ImGui::GetWindowWidth();
         float windowHeight = (float)ImGui::GetWindowHeight();
-        ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y,windowWidth,windowHeight);
+        ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
         //// camera
         //auto& cam = EditorCamera.GetComponent<CameraComponent>();
@@ -229,16 +221,16 @@ void EditorLayer::OnImGuiRender()
 
         static float bounds[] = { -0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f };
 
-        ImGuizmo::DrawGrid(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection), glm::value_ptr(Mat4(1.0f)), 10.f);
-        
+        //ImGuizmo::DrawGrid(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection), glm::value_ptr(Mat4(1.0f)), 10.f);
+
         ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
             op, ImGuizmo::MODE::LOCAL, glm::value_ptr(transform),
-            nullptr, snap ? snapValues : nullptr, bBounds ? bounds :NULL);
+            nullptr, snap ? snapValues : nullptr, bBounds ? bounds : NULL);
 
         if (ImGuizmo::IsUsing())
         {
             Vec3 Translation, Rotation, Scale;
-            Math::DecomposeTransform(transform, Translation, Rotation,Scale);
+            Math::DecomposeTransform(transform, Translation, Rotation, Scale);
 
             Vec3 DeltaRotation = Rotation - tc.Rotation;
             tc.Position = Translation;
@@ -281,7 +273,7 @@ void EditorLayer::OnImGuiRender()
                 ImGui::SameLine();
                 if (mat->m_AlbedoTexture)
                 {
-                    ImGui::Text("ID = %d",mat->m_AlbedoTexture->getID());
+                    ImGui::Text("ID = %d", mat->m_AlbedoTexture->getID());
                 }
                 ImGui::PushID(45);
                 if (ImGui::Button("..."))
@@ -297,7 +289,7 @@ void EditorLayer::OnImGuiRender()
                 ImGui::SameLine();
                 if (mat->m_SpecularTexture)
                 {
-                    ImGui::Text("ID = %d",mat->m_SpecularTexture->getID());
+                    ImGui::Text("ID = %d", mat->m_SpecularTexture->getID());
                 }
                 ImGui::PushID(48);
                 if (ImGui::Button("..."))
@@ -313,7 +305,25 @@ void EditorLayer::OnImGuiRender()
         }
     }
 
-    
+    ImGui::End();
+
+    ImGui::Begin("Debug");
+    // Using the _simplified_ one-liner Combo() api here
+    // See "Combo" section for examples of how to use the more complete BeginCombo()/EndCombo() api.
+    for (auto& kv : m_SceneRenderer.DebugFBTexturesID)
+    {
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+        if (ImGui::TreeNodeEx((void*)kv.second, flags, kv.first.c_str()))
+        {
+            ImGui::Image((void*)kv.second, ViewportPanelSize, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+
+            ImGui::TreePop();
+        }
+    }
+    //ImGui::DragFloat("SSAO Radius", &m_SceneRenderer.radius);
+    //ImGui::DragFloat("SSAO Scale", &m_SceneRenderer.scale);
+    //ImGui::DragFloat("SSAO Bias", &m_SceneRenderer.bias);
+    //ImGui::DragFloat("SSAO Power", &m_SceneRenderer.power);
     ImGui::End();
 }
 

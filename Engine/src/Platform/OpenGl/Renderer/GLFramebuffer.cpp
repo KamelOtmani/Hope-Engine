@@ -20,7 +20,7 @@ namespace HEngine
             glBindTexture(TextureTarget(multisampled), id);
         }
 
-        static void AttachColorTexture(uint32_t id, int samples, GLenum internalFormat, GLenum format, uint32_t width, uint32_t height, int index)
+        static void AttachColorTexture(uint32_t id, int samples, GLenum internalFormat, GLenum format, GLenum type, uint32_t width, uint32_t height, int index)
         {
             bool multisampled = samples > 1;
             if (multisampled)
@@ -29,7 +29,7 @@ namespace HEngine
             }
             else
             {
-                glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, nullptr);
+                glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format,type, nullptr);
 
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -51,7 +51,7 @@ namespace HEngine
             else
             {
                 glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
-
+                glGenerateMipmap(GL_TEXTURE_2D);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -114,11 +114,14 @@ namespace HEngine
 
         bool multisample = m_Specification.Samples > 1;
 
+        auto width = m_Specification.width;
+        auto height = m_Specification.height;
         // Attachments
         if (m_ColorAttachmentSpecifications.size())
         {
             m_ColorAttachementsID.resize(m_ColorAttachmentSpecifications.size());
             Utils::CreateTextures(multisample, m_ColorAttachementsID.data(), m_ColorAttachementsID.size());
+
 
             for (size_t i = 0; i < m_ColorAttachementsID.size(); i++)
             {
@@ -126,8 +129,12 @@ namespace HEngine
                 switch (m_ColorAttachmentSpecifications[i].textureFormat)
                 {
                 case FBTextureFormat::RGBA8:
-                    Utils::AttachColorTexture(m_ColorAttachementsID[i], m_Specification.Samples, GL_RGBA8,
-                        m_Specification.width, m_Specification.height, i);
+                    Utils::AttachColorTexture(m_ColorAttachementsID[i], m_Specification.Samples, GL_RGBA8,GL_RGBA,
+                        GL_UNSIGNED_BYTE,width, height, i);
+                    break;
+                case FBTextureFormat::RGBA16F:
+                    Utils::AttachColorTexture(m_ColorAttachementsID[i], m_Specification.Samples, GL_RGBA16F, GL_RGBA,
+                        GL_FLOAT,width, height, i);
                     break;
                 }
             }
@@ -141,7 +148,7 @@ namespace HEngine
             {
             case FBTextureFormat::DEPTH24STENCIL8:
                 Utils::AttachDepthTexture(m_DepthAttachementID, m_Specification.Samples, GL_DEPTH24_STENCIL8,
-                    GL_DEPTH_STENCIL_ATTACHMENT, m_Specification.width, m_Specification.height);
+                    GL_DEPTH_STENCIL_ATTACHMENT,width, height);
                 break;
             }
         }
@@ -166,7 +173,7 @@ namespace HEngine
     void GLFramebuffer::Bind()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
-        glViewport(0, 1, m_Specification.width, m_Specification.height);
+        glViewport(0, 1, m_Specification.width, m_Specification.height );
     }
 
     void GLFramebuffer::UnBind()

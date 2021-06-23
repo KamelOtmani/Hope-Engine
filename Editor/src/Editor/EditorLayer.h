@@ -5,6 +5,7 @@
 #include "Panels/OutlinerPanel.h"
 #include "Renderer/Framebuffer.h"
 #include "Renderer/EditorCamera.h"
+#include "Renderer/SceneRenderer.h"
 
 class EditorLayer : public HEngine::Layer
 {
@@ -29,6 +30,7 @@ private:
 
 private:
     Ref<HEngine::Scene> m_Scene;
+    HEngine::SceneRenderer m_SceneRenderer;
     HEngine::EditorCamera m_EditorCamera;
 
     // Rendering resources
