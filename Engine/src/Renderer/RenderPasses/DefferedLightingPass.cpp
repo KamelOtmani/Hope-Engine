@@ -47,6 +47,7 @@ namespace HEngine
             m_MainShader->SetFloat4("u_PointLights[" + std::to_string(i) + "].color", pointlight.Color);
             i++;
         }
+        m_MainShader->SetFloat("u_SkyLightIntensity", static_cast<float>(m_SceneRenderer->SkyLightIntensity));
     }
 
     void DefferedLightingPass::UploadGBufferTextureToShader()
@@ -60,8 +61,6 @@ namespace HEngine
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, gbuffer.Albedo);
         m_MainShader->SetInt("gBuffer.Albedo", 2);
-        m_SceneRenderer->m_EnviromentTexture->Bind(3);
-        m_MainShader->SetInt("u_EnvMap", 3);
     }
 
 }

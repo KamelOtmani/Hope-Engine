@@ -1,0 +1,125 @@
+Scene: Untitled Scene
+Entities:
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Sphere 4
+    TransformComponent:
+      Position: [-2.85682654, 0.5, 1.5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      Path: F:\source\Hope-Engine\Editor\assets\meshs\Sphere_1m.obj
+      Material:
+        Name: Plastic
+        Color: [0.864864886, 0.0701241866, 0.0701241866, 1]
+        Roughness: 0.300000012
+        Metalic: 0
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Sphere 3
+    TransformComponent:
+      Position: [-2.87739658, 0.5, -1.5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      Path: F:\source\Hope-Engine\Editor\assets\meshs\Sphere_1m.obj
+      Material:
+        Name: Metal Matt
+        Color: [1, 0.744650841, 0.268000007, 1]
+        Roughness: 1
+        Metalic: 1
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Sphere 2
+    TransformComponent:
+      Position: [-2.90108252, 0.488551587, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      Path: F:\source\Hope-Engine\Editor\assets\meshs\Sphere_1m.obj
+      Material:
+        Name: Plastic Matt
+        Color: [0.112207636, 0.745173752, 0.1219832, 1]
+        Roughness: 0.75
+        Metalic: 0
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Position: [2.29999995, 0.5, 0]
+      Rotation: [0, 0.569999993, 0]
+      Scale: [0.5, 0.5, 0.5]
+    MeshRendererComponent:
+      Path: F:\source\Hope-Engine\Editor\assets\meshs\Cube_1m.obj
+      Material:
+        Name: Plastic
+        Color: [0.864864886, 0.0701241866, 0.0701241866, 1]
+        Roughness: 0.300000012
+        Metalic: 0
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Dragon
+    TransformComponent:
+      Position: [0, 0.597811937, -1.75609612]
+      Rotation: [0, 0, 0]
+      Scale: [2.13999987, 2.13999987, 2.13999987]
+    MeshRendererComponent:
+      Path: F:\source\Hope-Engine\Editor\assets\meshs\Dragon\dragon.obj
+      Material:
+        Name: Plastic Matt
+        Color: [0.112207636, 0.745173752, 0.1219832, 1]
+        Roughness: 0.75
+        Metalic: 0
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Position: [0, 0.0187843144, 0]
+      Rotation: [0, 0, 0]
+      Scale: [18.0710773, 1, 17.4484806]
+    MeshRendererComponent:
+      Path: F:\source\Hope-Engine\Editor\assets\meshs\Plane_1m.obj
+      Material:
+        Name: Floor
+        Color: [1, 1, 1, 1]
+        Roughness: 0.899999976
+        Metalic: 1
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Sphere
+    TransformComponent:
+      Position: [0, 0.5, 1.68819618]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      Path: F:\source\Hope-Engine\Editor\assets\meshs\Sphere_1m.obj
+      Material:
+        Name: Metal
+        Color: [1, 1, 1, 1]
+        Roughness: 0
+        Metalic: 1
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Point Light
+    TransformComponent:
+      Position: [0, 2.75485992, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointLightComponent:
+      Color: [1, 1, 1, 1]
+      Intensity: 9
+      AffectWorld: true
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Bunny
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshRendererComponent:
+      Path: F:\source\Hope-Engine\Editor\assets\meshs\Bunny\bunny.obj
+      Material:
+        Name: Metal Matt
+        Color: [1, 0.744650841, 0.268000007, 1]
+        Roughness: 1
+        Metalic: 1

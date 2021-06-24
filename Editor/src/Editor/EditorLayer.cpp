@@ -49,6 +49,7 @@ void EditorLayer::OnAttach()
 
 void EditorLayer::OnUpdate(float dt)
 {
+    FrameTime = dt;
     // Update the camera  
     m_EditorCamera.OnUpdate(dt);
     m_SceneRenderer.m_Scene = m_Scene;
@@ -305,6 +306,13 @@ void EditorLayer::OnImGuiRender()
             ImGui::TreePop();
         }
     }
+
+    ImGui::End();
+    ImGui::Begin("Scene renderer");
+    ImGui::Text("Render Time = %2f ms", FrameTime * 1000);
+    ImGui::SameLine();
+    ImGui::Text("   %1f FPS", 1/FrameTime);
+    ImGui::SliderFloat("SkyLightIntensity", &m_SceneRenderer.SkyLightIntensity,0.0f,1.0f);
 
     ImGui::End();
 

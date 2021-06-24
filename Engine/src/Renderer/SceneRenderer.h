@@ -37,8 +37,11 @@ namespace HEngine
         Ref<VertexArray> m_ScreenQuadVAO;
         GBuffer gBuffer;
         Ref<Texture2D> m_EnviromentTexture;
+
+        float SkyLightIntensity = 0.1;
     private:
         // TODO : implement this as a render pass with shaders 
+        Ref<Framebuffer> m_PrefilterEnvMap;
         Ref<Framebuffer> m_OutputFramebuffer;
         //Ref<Framebuffer> m_SSAOPass;
 
@@ -47,6 +50,7 @@ namespace HEngine
         // Shaders
         Ref<Shader> m_CompositingShader;
         Ref<Shader> m_DefferedLightingShader;
+        Ref<Shader> m_PrefilterEnvMapShader;
 
         BasePass m_BasePass;
         DefferedLightingPass m_DefferedShadingPass;

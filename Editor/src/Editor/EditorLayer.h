@@ -37,12 +37,12 @@ private:
     Ref<HEngine::Framebuffer> m_MainFramebuffer;
 
     HEngine::Entity m_SelectionContext;
-    
+    float FrameTime = 0;
     // UI
     OutlinerPanel m_OutlinerPanel;
     uint32_t m_ViewportHeight, m_ViewportWidth;
     bool m_ViewportFocused = false, m_ViewportHovered = false;
     int m_GizmoType = -1;
-    float ImprotScale;
+    float ImprotScale = 1;
 
 };

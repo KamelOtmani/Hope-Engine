@@ -1,5 +1,5 @@
 #type vertex
-#version 330 core
+#version 450 core
 
 
 layout(location = 0) in vec3 a_Position;
@@ -17,7 +17,7 @@ void main()
 }
 
 #type pixel
-#version 330 core
+#version 450 core
 
 // DEFINES
 #define PI 3.14159265359
@@ -52,7 +52,10 @@ struct GBuffer
 };
 
 uniform GBuffer gBuffer;
+uniform sampler2D u_IrradianceMap;
 uniform sampler2D u_EnvMap;
+
+uniform float u_SkyLightIntensity;
 
 // GGX NDF
 float D_GGX(float NoH, float roughness) {
@@ -136,7 +139,8 @@ float Fd_Lambert() {
 vec2 DirToRectilinear(vec3 dir)
 {
     float x = atan(dir.z,dir.x) / TAU + 0.5; // 0-1
-    float y = dir.y * 0.5 + 0.5;
+    //float y = dir.y * 0.5 + 0.5;
+    float y = dir.y* 0.5 + 0.5;
     return vec2(x,y);
 }
 
@@ -160,6 +164,11 @@ vec3 CalculatePointLight(PointLight Light, vec3 Normal, vec3 Position, vec3 View
     return (Attenuation * (Diffuse + Specular).xyz * Light.color.xyz);
 }
 
+// We use this for Diffuse IBL as the fresnel dont take roughness as a parameter
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+} 
 
 void main()
 {
@@ -177,9 +186,12 @@ void main()
         // perceptually linear roughness to roughness (see parameterization)
     float Roughness = gNormalVS.w*gNormalVS.w;
     float Metalic = gAlbedo.w;
+        // Remapping 
+    vec3 diffuseColor = (1.0 - Metalic) * Albedo;
     vec3 f0 = vec3(0.04);
     f0      = mix(f0, Albedo, Metalic);
     vec3 Lighting = vec3(0.00);
+    float NoV = abs(dot(N, V)) + 1e-5;
     for(int i = 0; i < u_num_point_light; i++)
     {
         vec3 LightPosVS = (u_World2View * vec4(u_PointLights[i].position,1.0)).xyz;
@@ -190,7 +202,6 @@ void main()
         float attenuation = 1.0 / (distance * distance);
         vec3 radiance     = u_PointLights[i].color.rgb * attenuation; 
 
-        float NoV = abs(dot(N, V)) + 1e-5;
         float NoL = clamp(dot(N, L), 0.0, 1.0);
         float NoH = clamp(dot(N, H), 0.0, 1.0);
         float LoH = clamp(dot(L, H), 0.0, 1.0);
@@ -202,8 +213,6 @@ void main()
         // float V = V_SmithGGXCorrelated(NoV, NoL, 0.3);
         float V = GeometrySmith(NoV,NoL, Roughness);
 
-        // Remapping 
-        vec3 diffuseColor = (1.0 - Metalic) * Albedo;
 
         // Specular BRDF
         vec3 Fr = (D * V) * F;
@@ -213,10 +222,17 @@ void main()
         Lighting += (Fd + Fr)*radiance*NoL;
         // Lighting = vec3(V);
     }
-    // vec3 AmbientLighting = textureLod(u_EnvMap,DirToRectilinear(gNormalWS),3).rgb*Albedo;
-    vec3 AmbientLighting = vec3(0.25)*Albedo;
+    // IBL Lighting
+    vec3 kS = fresnelSchlickRoughness(max(dot(N, V),0.0), f0,Roughness);
+    vec3 kD = 1.0 - kS;
+    vec3 irradiance = texture(u_IrradianceMap, DirToRectilinear(gNormalWS)).rgb * u_SkyLightIntensity;
+    vec3 diffuse = diffuseColor * irradiance;
+    vec3 view = normalize((u_View2World*vec4(V,1.0)).xyz);
+    vec3 specularIBL = textureLod(u_EnvMap, DirToRectilinear(reflect(-view,gNormalWS)),pow(Roughness,0.25)*6).rgb * u_SkyLightIntensity;
+    vec3 AmbientLighting = (kD * diffuse) + (kS*specularIBL);
+    // vec3 AmbientLighting = vec3(0.25)*Albedo;
     color = vec4(Lighting + AmbientLighting,1.0);
-    //color = gAlbedo;
+    // color = vec4(kD,1.0);
 }
 
 

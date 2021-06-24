@@ -67,15 +67,36 @@ namespace HEngine
         m_OutputFramebuffer = Framebuffer::Create(finalFBSpec);
         DebugFBTexturesID["Final Color"] = m_OutputFramebuffer->getColorAttachement(0);
 
+        // Composition pass
+        FramebufferSpecification prefilterFBSpec;
+        prefilterFBSpec.width = 1600/2;
+        prefilterFBSpec.height = 900/2;
+        prefilterFBSpec.Attachements = { FBTextureFormat::RGBA16F };
+        m_PrefilterEnvMap = Framebuffer::Create(prefilterFBSpec);
 
-        m_CompositingShader = CreateRef<Shader>("assets/shaders/Compositing.glsl");
-        m_EnviromentTexture = Texture2D::Create("assets/textures/round_platform_1k.hdr", true,true);
+        
+
+
+        m_CompositingShader = CreateRef<Shader>("assets/shaders/Compositing.glsl"); 
+            m_EnviromentTexture = Texture2D::Create("assets/textures/round_platform_1k.hdr", true, true);
+        //m_EnviromentTexture = Texture2D::Create("assets/textures/equirect-debug.jpg", false, true);
         m_EnviromentTexture->textureSpec.bMipMaps = true;
         m_EnviromentTexture->UpdateSpecification();
         //m_SSAOShader = CreateRef<Shader>("assets/shaders/SSAO.glsl");
+        m_PrefilterEnvMapShader = CreateRef<Shader>("assets/shaders/PrefilterEnvMap.glsl");
+        DebugFBTexturesID[" EnvMap"] = m_EnviromentTexture->getID();
+        DebugFBTexturesID["Prefilter EnvMap"] = m_PrefilterEnvMap->getColorAttachement(0);
 
 
         Renderer::Initialise();
+
+        // Prefilter the Environement map 
+        m_PrefilterEnvMap->Bind();
+        m_PrefilterEnvMapShader->Bind();
+        m_EnviromentTexture->Bind(0);
+        m_PrefilterEnvMapShader->SetInt("u_EnvMap", 0);
+        Renderer::Submit(m_ScreenQuadVAO);
+        m_PrefilterEnvMap->UnBind();
     }
 
     void SceneRenderer::Update(EditorCamera& camera,float dt)
@@ -87,9 +108,16 @@ namespace HEngine
             RenderGeometryPass(camera);
             m_BasePass.EndFrame();
 
+
+
             m_DefferedShadingPass.m_MainShader->Bind();
             UploadCommunToShader(m_DefferedShadingPass.m_MainShader.get(), &camera);
-            m_DefferedShadingPass.m_MainShader->SetFloat3("u_CameraPositionWS", camera.GetPosition());
+            m_DefferedShadingPass.m_MainShader->SetFloat3("u_CameraPositionWS", camera.GetPosition()); 
+            glActiveTexture(GL_TEXTURE0+3);
+            glBindTexture(GL_TEXTURE_2D, m_PrefilterEnvMap->getColorAttachement(0));
+            m_DefferedShadingPass.m_MainShader->SetInt("u_IrradianceMap", 3);
+            m_EnviromentTexture->Bind(4);
+            m_DefferedShadingPass.m_MainShader->SetInt("u_EnvMap", 4);
             m_DefferedShadingPass.Render();
 
 
