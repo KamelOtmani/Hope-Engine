@@ -66,11 +66,14 @@ struct PointLight
 struct Material
 {
     vec4 Color;
-    float SpecularPower;
+    float Roughness;
+    float Metalic;
     sampler2D AlbedoTexture;
-    sampler2D SpecularTexture;
+    sampler2D RoughnessTexture;
+    sampler2D MetalicTexture;
     bool hasAlbedoTexture;
-    bool hasSpecularTexture;
+    bool hasRoughnessTexture;
+    bool hasMetalicTexture;
 };
 
 uniform PointLight u_PointLights[MAX_LIGHTS];
@@ -80,13 +83,14 @@ uniform int u_num_point_light;
 
 void main()
 {
-    gPosition = u_World2View *vec4( WS_Position,1.0);
     // gPosition = vec4(1.0,0.0,0.0,1.0);
-    gNormal = vec4(WS_Normal, u_Material.SpecularPower);
 
-    vec3 Diffuse = u_Material.hasAlbedoTexture ? texture(u_Material.AlbedoTexture, v_TexCoord).xyz : u_Material.Color.xyz;
-    float Specular = u_Material.hasSpecularTexture ? texture(u_Material.SpecularTexture, v_TexCoord).x : 0.5;
-    gAlbedo = vec4(Diffuse, Specular);
+    vec3 Albedo = u_Material.hasAlbedoTexture ? texture(u_Material.AlbedoTexture, v_TexCoord).xyz * u_Material.Color.xyz: u_Material.Color.xyz;
+    float Roughness = clamp(u_Material.hasRoughnessTexture ? texture(u_Material.RoughnessTexture, v_TexCoord).x * u_Material.Roughness: u_Material.Roughness,0.050,1.0);
+    float Metalic = clamp(u_Material.hasMetalicTexture ? texture(u_Material.MetalicTexture, v_TexCoord).x * u_Material.Metalic: u_Material.Metalic,0.0,1.0);
+    gAlbedo = vec4(Albedo, Metalic);
+    gNormal = vec4(WS_Normal, Roughness);
+    gPosition = u_World2View *vec4( WS_Position,1.0);
 
 
 }

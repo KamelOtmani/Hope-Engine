@@ -84,7 +84,7 @@ namespace HEngine
 	{
 	public:
         static Ref<Texture2D> Create(TextureSpecefication spec);
-        static Ref<Texture2D> Create(const std::string& path, bool bHDR = false);
+        static Ref<Texture2D> Create(const std::string& path, bool bHDR = false, bool bMipMaps= false);
         TextureSpecefication textureSpec;
 	};
 }

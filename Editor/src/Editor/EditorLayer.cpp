@@ -40,7 +40,7 @@ void EditorLayer::OnAttach()
     light.AddComponent<PointLightComponent>();
 
     testentt.GetComponent<MeshRendererComponent>().material = m_Scene->m_DefaultMaterial;
-    testentt.GetComponent<MeshRendererComponent>().path = "assets/meshs/Cube_1m.obj";
+    testentt.GetComponent<MeshRendererComponent>().path = "assets/meshs/Sphere_1m.obj";
     testentt.GetComponent<MeshRendererComponent>().UpdateMesh();
     m_EditorCamera.SetViewportSize(1600, 900);
     m_SceneRenderer.Initialize();
@@ -267,7 +267,7 @@ void EditorLayer::OnImGuiRender()
                 mat->name = std::string(buffer);
             }
             ImGui::ColorEdit4("Color", glm::value_ptr(mat->Color));
-            ImGui::DragFloat("SpecularPower", &mat->SpecularPower);
+            ImGui::DragFloat("Roughness", &mat->Roughness,0.05f,0.0f,1.0f);
             {
                 ImGui::Text("Diffuse Texture");
                 ImGui::SameLine();
@@ -285,21 +285,22 @@ void EditorLayer::OnImGuiRender()
                 ImGui::PopID();
             }
             {
-                ImGui::Text("Specular Texture");
+                ImGui::Text("Roughness Texture");
                 ImGui::SameLine();
-                if (mat->m_SpecularTexture)
+                if (mat->m_RoughnessTexture)
                 {
-                    ImGui::Text("ID = %d", mat->m_SpecularTexture->getID());
+                    ImGui::Text("ID = %d", mat->m_RoughnessTexture->getID());
                 }
                 ImGui::PushID(48);
                 if (ImGui::Button("..."))
                 {
                     auto& path = FileDialogs::OpenFile("PNG (*.png)\0*.png\0");
                     if (!path.empty())
-                        mat->m_SpecularTexture = Texture2D::Create(path);
+                        mat->m_RoughnessTexture = Texture2D::Create(path);
                 }
                 ImGui::PopID();
             }
+            ImGui::DragFloat("Metalic", &mat->Metalic, 0.05f, 0.0f, 1.0f);
 
             ImGui::TreePop();
         }

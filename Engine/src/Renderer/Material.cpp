@@ -31,7 +31,8 @@ namespace HEngine
     void Material::ApplyMaterial()
     {
         shader->SetFloat4("u_Material.Color", Color);
-        shader->SetFloat("u_Material.SpecularPower", SpecularPower);
+        shader->SetFloat("u_Material.Roughness", Roughness);
+        shader->SetFloat("u_Material.Metalic", Metalic);
         if (m_AlbedoTexture)
         {
             m_AlbedoTexture->Bind(0);
@@ -43,15 +44,25 @@ namespace HEngine
             shader->SetBool("u_Material.hasAlbedoTexture", false);
         }
 
-        if (m_SpecularTexture)
+        if (m_RoughnessTexture)
         {
-            m_SpecularTexture->Bind(1);
-            shader->SetInt("u_Material.SpecularTexture", 1);
-            shader->SetBool("u_Material.hasSpecularTexture", true);
+            m_RoughnessTexture->Bind(1);
+            shader->SetInt("u_Material.RoughnessTexture", 1);
+            shader->SetBool("u_Material.hasRoughnessTexture", true);
         }
         else
         {
-            shader->SetBool("u_Material.hasSpecularTexture", false);
+            shader->SetBool("u_Material.hasRougnessTexture", false);
+        }
+        if (m_MetalicTexture)
+        {
+            m_MetalicTexture->Bind(2);
+            shader->SetInt("u_Material.MetalicTexture", 2);
+            shader->SetBool("u_Material.hasMetalicTexture", true);
+        }
+        else
+        {
+            shader->SetBool("u_Material.hasMetalicTexture", false);
         }
     }
 

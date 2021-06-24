@@ -65,10 +65,10 @@ namespace HEngine
         return m_ID == ((GLTexture2D&)other).getID();
     }
 
-    GLTexture2D::GLTexture2D(std::string path,bool bHDR)      
+    GLTexture2D::GLTexture2D(std::string path,bool bHDR, bool bMipMaps)
     {
         int width, height, channels;
-        stbi_set_flip_vertically_on_load(0);
+        stbi_set_flip_vertically_on_load(true);
         void* data = nullptr;
         GLenum internalFormat = 0, dataFormat = 0;
         if (bHDR)
@@ -114,6 +114,21 @@ namespace HEngine
                 break;
             }
 
+            m_InternalFormat = internalFormat;
+            m_DataFormat = dataFormat;
+            textureSpec.bMipMaps = bMipMaps;
+            textureSpec.mipLevels = bMipMaps ? 7 : 1;
+
+            HASSERT(internalFormat& dataFormat, "Format not supported!");
+
+            glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);
+            glTextureStorage2D(m_ID, textureSpec.bMipMaps ? textureSpec.mipLevels : 1, internalFormat, textureSpec.width, textureSpec.height);
+            glGenerateTextureMipmap(m_ID);
+
+            UpdateSpecification();
+            glTextureSubImage2D(m_ID, 0, 0, 0, textureSpec.width, textureSpec.height, dataFormat, GL_FLOAT, data);
+            glGenerateTextureMipmap(m_ID);
+
         }
         else
         {
@@ -158,17 +173,21 @@ namespace HEngine
                 break;
             }
 
+            m_InternalFormat = internalFormat;
+            m_DataFormat = dataFormat;
+            textureSpec.bMipMaps = bMipMaps;
+            textureSpec.mipLevels = bMipMaps ? 7 : 1;
+
+            HASSERT(internalFormat& dataFormat, "Format not supported!");
+
+            glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);
+            glTextureStorage2D(m_ID, textureSpec.bMipMaps ? textureSpec.mipLevels : 1, internalFormat, textureSpec.width, textureSpec.height);
+            glGenerateTextureMipmap(m_ID);
+
+            UpdateSpecification();
+            glTextureSubImage2D(m_ID, 0, 0, 0, textureSpec.width, textureSpec.height, dataFormat, GL_UNSIGNED_BYTE, data);
+            glGenerateTextureMipmap(m_ID);
         }
-        m_InternalFormat = internalFormat;
-        m_DataFormat = dataFormat;
-
-        HASSERT(internalFormat & dataFormat, "Format not supported!");
-
-        glCreateTextures(GL_TEXTURE_2D, 1, &m_ID);
-        glTextureStorage2D(m_ID, 1, internalFormat, textureSpec.width, textureSpec.height);
-
-        UpdateSpecification();
-        glTextureSubImage2D(m_ID, 0, 0, 0, textureSpec.width, textureSpec.height, dataFormat, GL_UNSIGNED_BYTE, data);
 
         stbi_image_free(data);
     }

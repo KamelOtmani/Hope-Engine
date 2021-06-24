@@ -20,12 +20,12 @@ namespace HEngine
         return nullptr;
     }
 
-    Ref<Texture2D> Texture2D::Create(const std::string& path, bool bHDR)
+    Ref<Texture2D> Texture2D::Create(const std::string& path, bool bHDR, bool bMipMaps)
     {
         switch (Renderer::GetAPI())
         {
         case RHI::API::None:    HENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-        case RHI::API::OpenGL:  return CreateRef<GLTexture2D>(path, bHDR);
+        case RHI::API::OpenGL:  return CreateRef<GLTexture2D>(path, bHDR, bMipMaps);
         }
 
         HENGINE_ASSERT(false, "Unknown RendererAPI!");

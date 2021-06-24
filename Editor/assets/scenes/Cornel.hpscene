@@ -2,16 +2,43 @@ Scene: Untitled Scene
 Entities:
   - Entity: 12837192831273
     TagComponent:
-      Tag: Cornel
+      Tag: Point Light 2
     TransformComponent:
-      Position: [0, 0, 0]
+      Position: [0, 0.754478633, 0.984407187]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
+    PointLightComponent:
+      Color: [1, 1, 1, 1]
+      Intensity: 1
+      AffectWorld: true
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Ball
+    TransformComponent:
+      Position: [0.552082121, 0.240582496, 0.507580936]
+      Rotation: [0, 0, 0]
+      Scale: [0.5, 0.5, 0.5]
     MeshRendererComponent:
-      Path: F:\source\Hope-Engine\Editor\assets\meshs\Cornel.obj
+      Path: F:\source\Hope-Engine\Editor\assets\meshs\Sphere_1m.obj
       Material:
-        Name: DefaultMaterial
-        Color: [1, 1, 1, 1]
+        Name: Metal Material
+        Color: [1, 0, 0, 1]
+        Roughness: 0.400000006
+        Metalic: 0.899999976
+  - Entity: 12837192831273
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Position: [-0.354119897, 0.266000986, 0.0505614504]
+      Rotation: [0, -0.545430958, 0]
+      Scale: [0.270000041, 0.270000041, 0.270000041]
+    MeshRendererComponent:
+      Path: F:\source\Hope-Engine\Editor\assets\meshs\Cube_1m.obj
+      Material:
+        Name: Plastic Material
+        Color: [1, 0, 0, 1]
+        Roughness: 0.150000006
+        Metalic: 0
   - Entity: 12837192831273
     TagComponent:
       Tag: Light
@@ -25,13 +52,15 @@ Entities:
       AffectWorld: true
   - Entity: 12837192831273
     TagComponent:
-      Tag: Box
+      Tag: Cornel
     TransformComponent:
-      Position: [-0.437439561, 0.266000986, 0]
-      Rotation: [0, -0.545430958, 0]
-      Scale: [0.270000041, 0.270000041, 0.270000041]
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
     MeshRendererComponent:
-      Path: F:\source\Hope-Engine\Editor\assets\meshs\Cube_1m.obj
+      Path: F:\source\Hope-Engine\Editor\assets\meshs\Cornel.obj
       Material:
         Name: DefaultMaterial
-        Color: [1, 1, 1, 1]
+        Color: [1, 0.999989986, 0.999989986, 1]
+        Roughness: 0.400000006
+        Metalic: 0

@@ -1,6 +1,7 @@
 #include "hpch.h"
 
 #include "GLFramebuffer.h"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace HEngine
 {
@@ -70,6 +71,29 @@ namespace HEngine
             }
 
             return false;
+        }
+
+        static GLenum HopeFBTextureFormatToGL(FBTextureFormat format)
+        {
+            switch (format)
+            {
+            case FBTextureFormat::RGBA8:       return GL_RGBA8;
+            case FBTextureFormat::RGBA16F:     return GL_RGBA16F;
+            }
+
+            HASSERT(false,"Uknown format");
+            return 0;
+        }
+        static GLenum HopeFBTextureFormatElementTypeToGL(FBTextureFormat format)
+        {
+            switch (format)
+            {
+            case FBTextureFormat::RGBA8:       return GL_UNSIGNED_BYTE;
+            case FBTextureFormat::RGBA16F:     return GL_FLOAT;
+            }
+
+            HASSERT(false, "Uknown format");
+            return 0;
         }
     }
 
@@ -187,6 +211,19 @@ namespace HEngine
         m_Specification.width = width;
         m_Specification.height = height;
         Invalidate();
+    }
+
+    void GLFramebuffer::ClearAttachment(uint32_t attachmentIndex)
+    {
+        HASSERT(attachmentIndex < m_ColorAttachementsID.size(),"ERROR");
+
+        auto& spec = m_ColorAttachmentSpecifications[attachmentIndex];
+        //glClearTexImage(m_ColorAttachementsID[attachmentIndex], 0,Utils::HopeFBTextureFormatToGL(spec.textureFormat),
+        //    Utils::HopeFBTextureFormatElementTypeToGL(spec.textureFormat), &spec.ClearColor);
+
+        glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachmentIndex, m_ColorAttachementsID[attachmentIndex],0); //Only need to do this once.
+        glDrawBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+        glClearBufferfv(GL_COLOR, 0, glm::value_ptr(spec.ClearColor));
     }
 
 }

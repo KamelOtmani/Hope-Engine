@@ -10,7 +10,7 @@ namespace HEngine
     {
     public:
         GLTexture2D(TextureSpecefication spec);
-        GLTexture2D(std::string path, bool bHDR);
+        GLTexture2D(std::string path, bool bHDR,bool bMipMaps);
         virtual ~GLTexture2D();
 
         virtual uint32_t getWidth() const override { return textureSpec.width; };

@@ -3,6 +3,9 @@
 #include "Renderer/Framebuffer.h"
 #include "Renderer/GBuffer.h"
 
+#include "RenderPasses/BasePass.h"
+#include "RenderPasses/DefferedLightingPass.h"
+
 namespace HEngine
 {
 
@@ -31,20 +34,24 @@ namespace HEngine
         //float bias = 0.025;
         //float scale = 16;
         //float power = 1;
+        Ref<VertexArray> m_ScreenQuadVAO;
+        GBuffer gBuffer;
+        Ref<Texture2D> m_EnviromentTexture;
     private:
         // TODO : implement this as a render pass with shaders 
         Ref<Framebuffer> m_OutputFramebuffer;
-        Ref<Framebuffer> m_GeometryPass;
-        Ref<Framebuffer> m_DefferedShading;
         //Ref<Framebuffer> m_SSAOPass;
-        GBuffer gBuffer;
 
         // screen Quad
-        Ref<VertexArray> m_ScreenQuadVAO;
 
         // Shaders
         Ref<Shader> m_CompositingShader;
         Ref<Shader> m_DefferedLightingShader;
+
+        BasePass m_BasePass;
+        DefferedLightingPass m_DefferedShadingPass;
+
+
 
         //Ref<Shader> m_SSAOShader;
 

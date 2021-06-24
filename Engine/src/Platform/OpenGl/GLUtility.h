@@ -26,15 +26,15 @@ namespace HEngine
             }
         }
 
-        static GLenum HopeFilterToOpenGL(TEXTURE_FILTER filter, bool bUseMipMaps = false)
+        static GLenum HopeFilterToOpenGL(TEXTURE_FILTER filter, bool bUseMipMaps)
         {
             switch (filter)
             {
             case HEngine::TEXTURE_FILTER::NEAREST:
-                return bUseMipMaps ? GL_NEAREST : GL_NEAREST_MIPMAP_NEAREST;
+                return bUseMipMaps ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
                 break;
             case HEngine::TEXTURE_FILTER::LINEAR:
-                return bUseMipMaps ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR;
+                return bUseMipMaps ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR ;
                 break;
             default:
                 break;

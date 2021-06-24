@@ -153,6 +153,8 @@ namespace HEngine {
             out << YAML::Key << "Material";// Material
             out << YAML::BeginMap << YAML::Key << "Name" << YAML::Value << mesh.material->name;
             out << YAML::Key << "Color" << YAML::Value << mesh.material->Color;
+            out << YAML::Key << "Roughness" << YAML::Value << mesh.material->Roughness;
+            out << YAML::Key << "Metalic" << YAML::Value << mesh.material->Metalic;
             out << YAML::EndMap; // Material
 
             out << YAML::EndMap; // MeshRendererComponenet
@@ -285,6 +287,8 @@ namespace HEngine {
                             {
                                 mat = m_Scene->MatLibrary.AddNewMaterial(name);
                                 mat->shader = m_Scene->m_DefaultShader;
+                                mat->Roughness = material["Roughness"].as<float>();
+                                mat->Metalic = material["Metalic"].as<float>();
                                 mat->Color = material["Color"].as<Vec4>();
                                 mrc.material = mat;
                             }

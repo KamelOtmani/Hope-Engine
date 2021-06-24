@@ -20,10 +20,13 @@ namespace HEngine {
         void ApplyMaterial();
 
         Vec4 Color{ 1.0f };
-        float SpecularPower{ 16.0f };
+        float Roughness{ 0.3f };
+        float Metalic{ 0.0f };
+        //float Specular{ 0.3f };
 
         Ref<HEngine::Texture2D> m_AlbedoTexture;
-        Ref<HEngine::Texture2D> m_SpecularTexture;
+        Ref<HEngine::Texture2D> m_RoughnessTexture;
+        Ref<HEngine::Texture2D> m_MetalicTexture;
 
         Ref<HEngine::Shader> shader;
         std::string name = "unnamed material";

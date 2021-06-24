@@ -42,33 +42,24 @@ namespace HEngine
 
     void SceneRenderer::Initialize()
     {
-       FramebufferSpecification BasePassFBSpec;
-        BasePassFBSpec.width = 1600;
-        BasePassFBSpec.height = 900;
-        //                                  Postion                 Normal+ specular power (roughness)     Albedo + Specular
-        BasePassFBSpec.Attachements = { FBTextureFormat::RGBA16F,FBTextureFormat::RGBA16F,FBTextureFormat::RGBA16F,FBTextureFormat::Depth };
-        m_GeometryPass = Framebuffer::Create(BasePassFBSpec);
-        gBuffer.Position = m_GeometryPass->getColorAttachement(0);
-        gBuffer.Normal = m_GeometryPass->getColorAttachement(1);
-        gBuffer.Albedo = m_GeometryPass->getColorAttachement(2);
+        m_BasePass.setSceneRenderer(this);
+        m_BasePass.Initialize();
+        gBuffer.Position = m_BasePass.getFrameBuffer()->getColorAttachement(0);
+        gBuffer.Normal = m_BasePass.getFrameBuffer()->getColorAttachement(1);
+        gBuffer.Albedo = m_BasePass.getFrameBuffer()->getColorAttachement(2);
 
         DebugFBTexturesID["GBuffer.Position"] = gBuffer.Position;
         DebugFBTexturesID["GBuffer.Normal"] = gBuffer.Normal ;
         DebugFBTexturesID["GBuffer.Albedo"] = gBuffer.Albedo ;
 
-        // Deffered Shading Pass
-        FramebufferSpecification defferedFBSpec;
-        defferedFBSpec.width = 1600;
-        defferedFBSpec.height = 900;
-        defferedFBSpec.Attachements = { FBTextureFormat::RGBA16F };
-        m_DefferedShading = Framebuffer::Create(defferedFBSpec);
-        DebugFBTexturesID["Deffered Shading Result"] = m_DefferedShading->getColorAttachement(0);
+        m_DefferedShadingPass.setSceneRenderer(this);
+        m_DefferedShadingPass.Initialize();
+        DebugFBTexturesID["Deffered Shading Result"] = m_DefferedShadingPass.getFrameBuffer()->getColorAttachement(0);
 
 
 
 
-
-        // Deffered Shading Pass
+        // Composition pass
         FramebufferSpecification finalFBSpec;
         finalFBSpec.width = 1600;
         finalFBSpec.height = 900;
@@ -78,8 +69,12 @@ namespace HEngine
 
 
         m_CompositingShader = CreateRef<Shader>("assets/shaders/Compositing.glsl");
-        m_DefferedLightingShader = CreateRef<Shader>("assets/shaders/DefferedShading.glsl");
+        m_EnviromentTexture = Texture2D::Create("assets/textures/round_platform_1k.hdr", true,true);
+        m_EnviromentTexture->textureSpec.bMipMaps = true;
+        m_EnviromentTexture->UpdateSpecification();
         //m_SSAOShader = CreateRef<Shader>("assets/shaders/SSAO.glsl");
+
+
         Renderer::Initialise();
     }
 
@@ -88,39 +83,14 @@ namespace HEngine
         if (m_Scene)
         {
             // BasePass
-            m_GeometryPass->Bind();
-            RHICommand::SetClearColor(Vec4(0.1f));
-            RHICommand::Clear();
+            m_BasePass.BeginFrame();
             RenderGeometryPass(camera);
-            m_GeometryPass->UnBind();
+            m_BasePass.EndFrame();
 
-            // Deffered Shading
-            m_DefferedShading->Bind();
-            RHICommand::SetClearColor(Vec4(0.f));
-            RHICommand::Clear();
-            m_DefferedLightingShader->Bind();
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, gBuffer.Position);
-            m_DefferedLightingShader->SetInt("gBuffer.Position", 0);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, gBuffer.Normal);
-            m_DefferedLightingShader->SetInt("gBuffer.Normal", 1);
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, gBuffer.Albedo);
-            m_DefferedLightingShader->SetInt("gBuffer.Albedo", 2);
-            m_Scene->UpdateLightsInfo();
-            UploadCommunToShader(m_DefferedLightingShader.get(), &camera);
-            m_DefferedLightingShader->SetInt("u_num_point_light", static_cast<int>(m_Scene->PointLightList.size()));
-            int i = 0;
-            for (auto& pointlight : m_Scene->PointLightList)
-            {
-                m_DefferedLightingShader->SetFloat3("u_PointLights[" + std::to_string(i) + "].position", pointlight.Position);
-                m_DefferedLightingShader->SetFloat4("u_PointLights[" + std::to_string(i) + "].color", pointlight.Color);
-                i++;
-            }
-            m_DefferedLightingShader->SetFloat3("u_CameraPositionWS", camera.GetPosition());
-            Renderer::Submit(m_ScreenQuadVAO);
-            m_DefferedShading->UnBind();
+            m_DefferedShadingPass.m_MainShader->Bind();
+            UploadCommunToShader(m_DefferedShadingPass.m_MainShader.get(), &camera);
+            m_DefferedShadingPass.m_MainShader->SetFloat3("u_CameraPositionWS", camera.GetPosition());
+            m_DefferedShadingPass.Render();
 
 
 
@@ -130,7 +100,7 @@ namespace HEngine
             //RHICommand::Clear();
             m_CompositingShader->Bind();
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, m_DefferedShading->getColorAttachement(0));
+            glBindTexture(GL_TEXTURE_2D, m_DefferedShadingPass.getFrameBuffer()->getColorAttachement(0));
             Renderer::Submit(m_ScreenQuadVAO);
             m_OutputFramebuffer->UnBind();
         }
