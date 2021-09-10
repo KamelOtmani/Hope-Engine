@@ -1,7 +1,6 @@
 #include "hpch.h"
 #include "RHI.h"
 
-
 // TEMPORARY , SHOULD BE DECIDED AT CONTEXT CREATION
 // CURRENTLY HOPE ONLY SUPORT OPENGL
-HEngine::RHI::API HEngine::RHI::s_API = RHI::API::OpenGL;
+const HEngine::RHI::API HEngine::RHI::s_API = RHI::API::OpenGL;

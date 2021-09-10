@@ -136,10 +136,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Editor\EditorLayer.h" />
+    <ClInclude Include="src\Editor\Panels\ContentBrowser.h" />
     <ClInclude Include="src\Editor\Panels\OutlinerPanel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Editor\EditorLayer.cpp" />
+    <ClCompile Include="src\Editor\Panels\ContentBrowser.cpp" />
     <ClCompile Include="src\Editor\Panels\OutlinerPanel.cpp" />
     <ClCompile Include="src\EditorApp.cpp" />
   </ItemGroup>

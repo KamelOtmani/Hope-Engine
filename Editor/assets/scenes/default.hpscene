@@ -2,6 +2,17 @@ Scene: Untitled Scene
 Entities:
   - Entity: 12837192831273
     TagComponent:
+      Tag: Point light
+    TransformComponent:
+      Position: [0, 1.5, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    PointLightComponent:
+      Color: [1, 1, 1, 1]
+      Intensity: 1
+      AffectWorld: true
+  - Entity: 12837192831273
+    TagComponent:
       Tag: Test Sprite
     TransformComponent:
       Position: [0, 0, 0]
@@ -17,7 +28,9 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshRendererComponent:
-      Path: assets/meshs/Cube_1m.obj
+      Path: assets/meshs/Sphere_1m.obj
       Material:
         Name: DefaultMaterial
         Color: [1, 1, 1, 1]
+        Roughness: 0.300000012
+        Metalic: 0

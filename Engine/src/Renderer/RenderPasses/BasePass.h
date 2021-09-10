@@ -1,19 +1,16 @@
 #pragma once
 
 #include "Renderer/RenderPass.h"
-namespace HEngine
-{
-    class BasePass : public RenderPass
-    {
-    public:
-        BasePass();
-        ~BasePass();
+namespace HEngine {
+class BasePass : public RenderPass {
+public:
+    BasePass();
+    ~BasePass();
 
-        void Initialize() override;
-        void Render() override {};
+    void Initialize() override;
+    void Render() override {};
 
-        void BeginFrame();
-        void EndFrame();
-
-    };
+    void BeginFrame();
+    void EndFrame();
+};
 }

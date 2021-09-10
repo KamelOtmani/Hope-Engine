@@ -4,16 +4,16 @@
 
 namespace HEngine {
 
-    class Serializer
-    {
-    public:
-        Serializer(const Ref<Scene>& scene);
+class Serializer {
+public:
+    Serializer(const Ref<Scene>& scene);
 
-        void Serialize(const std::string& filepath);
+    void Serialize(const std::string& filepath);
 
-        bool Deserialize(const std::string& filepath);
-    private:
-        Ref<Scene> m_Scene;
-    };
+    bool Deserialize(const std::string& filepath);
+
+private:
+    Ref<Scene> m_Scene;
+};
 
 }

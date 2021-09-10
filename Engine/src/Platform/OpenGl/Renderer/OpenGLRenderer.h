@@ -2,13 +2,11 @@
 #include "Renderer/RHI/RHI.h"
 
 namespace HEngine {
-    class OpenGLRenderer : public RHI
-    {
-    public:
-        virtual void SetClearColor(const glm::vec4& color) override;
-        virtual void Clear() override;
+class OpenGLRenderer : public RHI {
+public:
+    void SetClearColor(const glm::vec4& color) override;
+    void Clear() override;
 
-        virtual void DrawIndexed(const Ref<VertexArray>& vertexArray) override;
-    };
+    void DrawIndexed(const Ref<VertexArray>& vertexArray) override;
+};
 }
-

@@ -144,8 +144,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Renderer\RenderPasses\DefferedLightingPass.h" />
-    <ClInclude Include="src\Renderer\RenderPass.h" />
     <ClInclude Include="src\Core\Application.h" />
     <ClInclude Include="src\Core\Core.h" />
     <ClInclude Include="src\Core\EntryPoint.h" />
@@ -186,13 +184,18 @@
     <ClInclude Include="src\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Renderer\Material.h" />
     <ClInclude Include="src\Renderer\Mesh.h" />
-    <ClInclude Include="src\Renderer\RenderPasses\BasePass.h" />
     <ClInclude Include="src\Renderer\RHI\RHI.h" />
     <ClInclude Include="src\Renderer\RHI\RHICommand.h" />
+    <ClInclude Include="src\Renderer\RenderPass.h" />
+    <ClInclude Include="src\Renderer\RenderPasses\BasePass.h" />
+    <ClInclude Include="src\Renderer\RenderPasses\DefferedLightingPass.h" />
     <ClInclude Include="src\Renderer\SceneRenderer.h" />
     <ClInclude Include="src\Renderer\Shader.h" />
     <ClInclude Include="src\Renderer\Texture.h" />
+    <ClInclude Include="src\UI\ImGui_Custom.h" />
     <ClInclude Include="src\Utility\AssetImporter.h" />
+    <ClInclude Include="src\Utility\Color.h" />
+    <ClInclude Include="src\Utility\Debug.h" />
     <ClInclude Include="src\Utility\PlatformUtils.h" />
     <ClInclude Include="vendor\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="vendor\glm\glm\common.hpp" />
@@ -606,8 +609,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Renderer\RenderPasses\DefferedLightingPass.cpp" />
-    <ClCompile Include="src\Renderer\RenderPass.cpp" />
     <ClCompile Include="src\Core\Application.cpp" />
     <ClCompile Include="src\Core\Log.cpp" />
     <ClCompile Include="src\ECS\Entity.cpp" />
@@ -637,14 +638,17 @@
     <ClCompile Include="src\Renderer\Framebuffer.cpp" />
     <ClCompile Include="src\Renderer\Material.cpp" />
     <ClCompile Include="src\Renderer\Mesh.cpp" />
-    <ClCompile Include="src\Renderer\RenderPasses\BasePass.cpp" />
     <ClCompile Include="src\Renderer\RHI\RHI.cpp" />
     <ClCompile Include="src\Renderer\RHI\RHICommand.cpp" />
+    <ClCompile Include="src\Renderer\RenderPass.cpp" />
+    <ClCompile Include="src\Renderer\RenderPasses\BasePass.cpp" />
+    <ClCompile Include="src\Renderer\RenderPasses\DefferedLightingPass.cpp" />
     <ClCompile Include="src\Renderer\SceneRenderer.cpp" />
     <ClCompile Include="src\Renderer\Shader.cpp" />
     <ClCompile Include="src\Renderer\Source.cpp" />
     <ClCompile Include="src\Renderer\Texture.cpp" />
     <ClCompile Include="src\Utility\AssetImporter.cpp" />
+    <ClCompile Include="src\Utility\Debug.cpp" />
     <ClCompile Include="vendor\ImGuizmo\ImGuizmo.cpp">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>

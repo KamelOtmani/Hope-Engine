@@ -2,9 +2,6 @@
 
 #include "Texture.h"
 
-
-namespace HEngine
-{
-
+namespace HEngine {
 
 }

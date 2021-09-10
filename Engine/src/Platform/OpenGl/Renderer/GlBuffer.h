@@ -4,36 +4,36 @@
 
 namespace HEngine {
 
-	class GLVertexBuffer : public VertexBuffer
-	{
-	public:
-		GLVertexBuffer(float* vertices, uint32_t size);
-		GLVertexBuffer(const std::vector<FVertex>& vertices, uint32_t size);
-		virtual ~GLVertexBuffer();
+class GLVertexBuffer : public VertexBuffer {
+public:
+    GLVertexBuffer(float* vertices, uint32_t size);
+    GLVertexBuffer(const std::vector<FVertex>& vertices, uint32_t size);
+    virtual ~GLVertexBuffer();
 
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+    void Bind() const override;
+    void Unbind() const override;
 
-		virtual const BufferLayout& GetLayout() const override { return m_Layout; }
-		virtual void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
-	private:
-		uint32_t m_ID;
-		BufferLayout m_Layout;
-	};
+    const BufferLayout& GetLayout() const override { return m_Layout; }
+    void SetLayout(const BufferLayout& layout) override { m_Layout = layout; }
 
-	class GLIndexBuffer : public IndexBuffer
-	{
-	public:
-		GLIndexBuffer(uint32_t* indices, uint32_t count);
-		virtual ~GLIndexBuffer();
+private:
+    uint32_t m_ID;
+    BufferLayout m_Layout;
+};
 
-		virtual void Bind() const;
-		virtual void Unbind() const;
+class GLIndexBuffer : public IndexBuffer {
+public:
+    GLIndexBuffer(uint32_t* indices, uint32_t count);
+    virtual ~GLIndexBuffer();
 
-		virtual uint32_t GetCount() const { return m_Count; }
-	private:
-		uint32_t m_ID;
-		uint32_t m_Count;
-	};
+    void Bind() const;
+    void Unbind() const;
+
+    uint32_t GetCount() const { return m_Count; }
+
+private:
+    uint32_t m_ID;
+    uint32_t m_Count;
+};
 
 }

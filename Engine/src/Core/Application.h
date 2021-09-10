@@ -2,10 +2,10 @@
 
 #include "Core.h"
 #include "Core/Window.h"
-#include "Events/Event.h"
 #include "Events/AppEvent.h"
-#include "Layers/LayerStack.h"
+#include "Events/Event.h"
 #include "Layers/ImGuiLayer.h"
+#include "Layers/LayerStack.h"
 
 #include "Renderer/Shader.h"
 
@@ -14,41 +14,41 @@
 
 namespace HEngine {
 
-	class HOPE_API Application
-	{
-	public:
-		Application();
-		virtual ~Application();
+class HOPE_API Application {
+public:
+    Application();
+    virtual ~Application();
 
-		void Run();
-		void Close();
+    void Run();
+    void Close();
 
-		void OnEvent(Event& e);
-		void PushLayer(Layer* layer);
-		void PushOverlay(Layer* layer);
+    void OnEvent(Event& e);
+    void PushLayer(Layer* layer);
+    void PushOverlay(Layer* layer);
 
-		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+    ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 
-		inline static Application& Get() { return *s_Instance; }
-		inline Window& GetWindow() { return *m_Window; }
-	private:
-		bool OnWindowClose(WindowCloseEvent& e);
+    inline static Application& Get() { return *s_Instance; }
+    inline Window& GetWindow() { return *m_Window; }
 
-		//std::unique_ptr<Scene> m_Window;
-		// Old stuff
-		// TODO : Remove all the stuff that is not needed for the app
+private:
+    bool OnWindowClose(WindowCloseEvent& e);
 
-		std::unique_ptr<Window> m_Window;
-		ImGuiLayer* m_ImGuiLayer;
-		bool m_Running = true;
-        LayerStack m_LayerStack;
-        float m_LastFrameTime = 0.0f;
+    //std::unique_ptr<Scene> m_Window;
+    // Old stuff
+    // TODO : Remove all the stuff that is not needed for the app
 
-	private:
-		static Application* s_Instance;
-	};
+    std::unique_ptr<Window> m_Window;
+    ImGuiLayer* m_ImGuiLayer;
+    bool m_Running = true;
+    LayerStack m_LayerStack;
+    float m_LastFrameTime = 0.0f;
 
-	// To be defined in CLIENT
-	Application* CreateApplication();
-	
+private:
+    static Application* s_Instance;
+};
+
+// To be defined in CLIENT
+Application* CreateApplication();
+
 }

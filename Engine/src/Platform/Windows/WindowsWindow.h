@@ -5,41 +5,40 @@
 #include <GLFW/glfw3.h>
 namespace HEngine {
 
-	class WindowsWindow : public Window
-	{
-	public:
-		WindowsWindow(const WindowProps& props);
-		virtual ~WindowsWindow();
+class WindowsWindow : public Window {
+public:
+    WindowsWindow(const WindowProps& props);
+    virtual ~WindowsWindow();
 
-		void OnUpdate(float dt) override;
+    void OnUpdate(float dt) override;
 
-		inline unsigned int GetWidth() const override { return m_Data.Width; }
-		inline unsigned int GetHeight() const override { return m_Data.Height; }
+    inline unsigned int GetWidth() const override { return m_Data.Width; }
+    inline unsigned int GetHeight() const override { return m_Data.Height; }
 
-		// Window attributes
-		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
-		void SetVSync(bool enabled) override;
-		bool IsVSync() const override;
+    // Window attributes
+    inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallback = callback; }
+    void SetVSync(bool enabled) override;
+    bool IsVSync() const override;
 
-		inline virtual void* GetNativeWindow() const { return m_Window; }
-	private:
-		virtual void Init(const WindowProps& props);
-		virtual void Shutdown();
-	private:
-		GraphicsContext* m_Context;
-		GLFWwindow* m_Window;
+    inline void* GetNativeWindow() const override { return m_Window; }
 
-		struct WindowData
-		{
-			std::string Title;
-			unsigned int Width, Height;
-			bool VSync;
+private:
+    virtual void Init(const WindowProps& props);
+    virtual void Shutdown();
 
-			EventCallbackFn EventCallback;
-		};
+private:
+    GraphicsContext* m_Context;
+    GLFWwindow* m_Window;
 
-		WindowData m_Data;
-	};
+    struct WindowData {
+        std::string Title;
+        unsigned int Width, Height;
+        bool VSync;
+
+        EventCallbackFn EventCallback;
+    };
+
+    WindowData m_Data;
+};
 
 }
-

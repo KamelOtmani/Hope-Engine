@@ -6,195 +6,172 @@
 
 #include "ECS/Components.h"
 
-namespace HEngine
+namespace HEngine {
+static float lerp(float a, float b, float f)
 {
-    static float lerp(float a, float b, float f)
-    {
-        return a + f * (b - a);
-    }
+    return a + f * (b - a);
+}
 
-    SceneRenderer::SceneRenderer()
-    {
-        std::vector<FVertex> verts = {
-    { Vec3{-1.0f, 1.0f, 0.0f }  ,Vec3{0.0f,0.0f,1.0f },Vec2{0.0f,1.0f},  Vec4{1.0f}},
-    { Vec3{-1.0f, -1.0f, 0.0f}    ,Vec3{0.0f,0.0f,1.0f },Vec2{0.0f,0.0f},  Vec4{1.0f}},
-    { Vec3{1.0f, 1.0f, 0.0f}     ,Vec3{0.0f,0.0f,1.0f },Vec2{1.0f,1.0f},  Vec4{1.0f}},
-    { Vec3{1.0f, -1.0f, 0.0f}    ,Vec3{0.0f,0.0f,1.0f },Vec2{1.0f,0.0f},  Vec4{1.0f}},
-        };
-        std::vector<uint32_t> indx = { 0, 1,2,2,1,3 };
-        m_ScreenQuadVAO.reset(VertexArray::Create());
-        Ref<VertexBuffer> vertexBuffer;
-        vertexBuffer.reset(VertexBuffer::Create(verts, verts.size() * static_cast<uint32_t>(sizeof(Vec3) + sizeof(Vec3)+ sizeof(Vec2) + sizeof(Vec4))));
-        BufferLayout layout = {
-            { ShaderDataType::Float3, "a_Position" },
-            { ShaderDataType::Float3, "a_Normal" },
-            { ShaderDataType::Float2, "a_TexCoord" },
-            { ShaderDataType::Float4, "a_Color" }
-        };
-        vertexBuffer->SetLayout(layout);
-        m_ScreenQuadVAO->AddVertexBuffer(vertexBuffer);
+SceneRenderer::SceneRenderer()
+{
+    std::vector<FVertex> verts = {
+        { Vec3 { -1.0f, 1.0f, 0.0f }, Vec3 { 0.0f, 0.0f, 1.0f }, Vec2 { 0.0f, 1.0f }, Vec4 { 1.0f } },
+        { Vec3 { -1.0f, -1.0f, 0.0f }, Vec3 { 0.0f, 0.0f, 1.0f }, Vec2 { 0.0f, 0.0f }, Vec4 { 1.0f } },
+        { Vec3 { 1.0f, 1.0f, 0.0f }, Vec3 { 0.0f, 0.0f, 1.0f }, Vec2 { 1.0f, 1.0f }, Vec4 { 1.0f } },
+        { Vec3 { 1.0f, -1.0f, 0.0f }, Vec3 { 0.0f, 0.0f, 1.0f }, Vec2 { 1.0f, 0.0f }, Vec4 { 1.0f } },
+    };
+    std::vector<uint32_t> indx = { 0, 1, 2, 2, 1, 3 };
+    m_ScreenQuadVAO.reset(VertexArray::Create());
+    Ref<VertexBuffer> vertexBuffer;
+    vertexBuffer.reset(VertexBuffer::Create(verts, verts.size() * static_cast<uint32_t>(sizeof(Vec3) + sizeof(Vec3) + sizeof(Vec2) + sizeof(Vec4))));
+    BufferLayout layout = {
+        { ShaderDataType::Float3, "a_Position" },
+        { ShaderDataType::Float3, "a_Normal" },
+        { ShaderDataType::Float2, "a_TexCoord" },
+        { ShaderDataType::Float4, "a_Color" }
+    };
+    vertexBuffer->SetLayout(layout);
+    m_ScreenQuadVAO->AddVertexBuffer(vertexBuffer);
 
-        Ref<IndexBuffer> indexBuffer;
-        indexBuffer.reset(IndexBuffer::Create(indx.data(), static_cast<uint32_t>(indx.size())));
-        m_ScreenQuadVAO->SetIndexBuffer(indexBuffer);
+    Ref<IndexBuffer> indexBuffer;
+    indexBuffer.reset(IndexBuffer::Create(indx.data(), static_cast<uint32_t>(indx.size())));
+    m_ScreenQuadVAO->SetIndexBuffer(indexBuffer);
+}
 
-    }
+void SceneRenderer::Initialize()
+{
+    m_BasePass.setSceneRenderer(this);
+    m_BasePass.Initialize();
+    gBuffer.Position = m_BasePass.getFrameBuffer()->getColorAttachement(0);
+    gBuffer.Normal = m_BasePass.getFrameBuffer()->getColorAttachement(1);
+    gBuffer.Albedo = m_BasePass.getFrameBuffer()->getColorAttachement(2);
 
-    void SceneRenderer::Initialize()
-    {
-        m_BasePass.setSceneRenderer(this);
-        m_BasePass.Initialize();
-        gBuffer.Position = m_BasePass.getFrameBuffer()->getColorAttachement(0);
-        gBuffer.Normal = m_BasePass.getFrameBuffer()->getColorAttachement(1);
-        gBuffer.Albedo = m_BasePass.getFrameBuffer()->getColorAttachement(2);
+    DebugFBTexturesID["GBuffer.Position"] = gBuffer.Position;
+    DebugFBTexturesID["GBuffer.Normal"] = gBuffer.Normal;
+    DebugFBTexturesID["GBuffer.Albedo"] = gBuffer.Albedo;
 
-        DebugFBTexturesID["GBuffer.Position"] = gBuffer.Position;
-        DebugFBTexturesID["GBuffer.Normal"] = gBuffer.Normal ;
-        DebugFBTexturesID["GBuffer.Albedo"] = gBuffer.Albedo ;
+    m_DefferedShadingPass.setSceneRenderer(this);
+    m_DefferedShadingPass.Initialize();
+    DebugFBTexturesID["Deffered Shading Result"] = m_DefferedShadingPass.getFrameBuffer()->getColorAttachement(0);
 
-        m_DefferedShadingPass.setSceneRenderer(this);
-        m_DefferedShadingPass.Initialize();
-        DebugFBTexturesID["Deffered Shading Result"] = m_DefferedShadingPass.getFrameBuffer()->getColorAttachement(0);
+    // Composition pass
+    FramebufferSpecification finalFBSpec;
+    finalFBSpec.width = 1600;
+    finalFBSpec.height = 900;
+    finalFBSpec.Attachements = { FBTextureFormat::RGBA8 };
+    m_OutputFramebuffer = Framebuffer::Create(finalFBSpec);
+    DebugFBTexturesID["Final Color"] = m_OutputFramebuffer->getColorAttachement(0);
 
+    // Composition pass
+    FramebufferSpecification prefilterFBSpec;
+    prefilterFBSpec.width = 1600 / 2;
+    prefilterFBSpec.height = 900 / 2;
+    prefilterFBSpec.Attachements = { FBTextureFormat::RGBA16F };
+    m_PrefilterEnvMap = Framebuffer::Create(prefilterFBSpec);
 
+    m_CompositingShader = CreateRef<Shader>("assets/shaders/Compositing.glsl");
+    m_EnviromentTexture = Texture2D::Create("assets/textures/round_platform_1k.hdr", true, true);
+    //m_EnviromentTexture = Texture2D::Create("assets/textures/equirect-debug.jpg", false, true);
+    m_EnviromentTexture->textureSpec.bMipMaps = true;
+    m_EnviromentTexture->UpdateSpecification();
+    //m_SSAOShader = CreateRef<Shader>("assets/shaders/SSAO.glsl");
+    m_PrefilterEnvMapShader = CreateRef<Shader>("assets/shaders/PrefilterEnvMap.glsl");
+    DebugFBTexturesID[" EnvMap"] = m_EnviromentTexture->getID();
+    DebugFBTexturesID["Prefilter EnvMap"] = m_PrefilterEnvMap->getColorAttachement(0);
 
+    Renderer::Initialise();
 
-        // Composition pass
-        FramebufferSpecification finalFBSpec;
-        finalFBSpec.width = 1600;
-        finalFBSpec.height = 900;
-        finalFBSpec.Attachements = { FBTextureFormat::RGBA8 };
-        m_OutputFramebuffer = Framebuffer::Create(finalFBSpec);
-        DebugFBTexturesID["Final Color"] = m_OutputFramebuffer->getColorAttachement(0);
+    // Prefilter the Environement map
+    m_PrefilterEnvMap->Bind();
+    m_PrefilterEnvMapShader->Bind();
+    m_EnviromentTexture->Bind(0);
+    m_PrefilterEnvMapShader->SetInt("u_EnvMap", 0);
+    Renderer::Submit(m_ScreenQuadVAO);
+    m_PrefilterEnvMap->UnBind();
+}
 
-        // Composition pass
-        FramebufferSpecification prefilterFBSpec;
-        prefilterFBSpec.width = 1600/2;
-        prefilterFBSpec.height = 900/2;
-        prefilterFBSpec.Attachements = { FBTextureFormat::RGBA16F };
-        m_PrefilterEnvMap = Framebuffer::Create(prefilterFBSpec);
+void SceneRenderer::Update(EditorCamera& camera, float dt)
+{
+    if (m_Scene) {
+        // BasePass
+        m_BasePass.BeginFrame();
+        RenderGeometryPass(camera);
+        m_BasePass.EndFrame();
 
-        
+        m_DefferedShadingPass.m_MainShader->Bind();
+        UploadCommunToShader(m_DefferedShadingPass.m_MainShader.get(), &camera);
+        m_DefferedShadingPass.m_MainShader->SetFloat3("u_CameraPositionWS", camera.GetPosition());
+        glActiveTexture(GL_TEXTURE0 + 3);
+        glBindTexture(GL_TEXTURE_2D, m_PrefilterEnvMap->getColorAttachement(0));
+        m_DefferedShadingPass.m_MainShader->SetInt("u_IrradianceMap", 3);
+        m_EnviromentTexture->Bind(4);
+        m_DefferedShadingPass.m_MainShader->SetInt("u_EnvMap", 4);
+        m_DefferedShadingPass.Render();
 
-
-        m_CompositingShader = CreateRef<Shader>("assets/shaders/Compositing.glsl"); 
-            m_EnviromentTexture = Texture2D::Create("assets/textures/round_platform_1k.hdr", true, true);
-        //m_EnviromentTexture = Texture2D::Create("assets/textures/equirect-debug.jpg", false, true);
-        m_EnviromentTexture->textureSpec.bMipMaps = true;
-        m_EnviromentTexture->UpdateSpecification();
-        //m_SSAOShader = CreateRef<Shader>("assets/shaders/SSAO.glsl");
-        m_PrefilterEnvMapShader = CreateRef<Shader>("assets/shaders/PrefilterEnvMap.glsl");
-        DebugFBTexturesID[" EnvMap"] = m_EnviromentTexture->getID();
-        DebugFBTexturesID["Prefilter EnvMap"] = m_PrefilterEnvMap->getColorAttachement(0);
-
-
-        Renderer::Initialise();
-
-        // Prefilter the Environement map 
-        m_PrefilterEnvMap->Bind();
-        m_PrefilterEnvMapShader->Bind();
-        m_EnviromentTexture->Bind(0);
-        m_PrefilterEnvMapShader->SetInt("u_EnvMap", 0);
+        // render Compositing pass
+        m_OutputFramebuffer->Bind();
+        //RHICommand::SetClearColor(Vec4(0.f));
+        //RHICommand::Clear();
+        m_CompositingShader->Bind();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_DefferedShadingPass.getFrameBuffer()->getColorAttachement(0));
         Renderer::Submit(m_ScreenQuadVAO);
-        m_PrefilterEnvMap->UnBind();
+        m_OutputFramebuffer->UnBind();
     }
+}
 
-    void SceneRenderer::Update(EditorCamera& camera,float dt)
+void SceneRenderer::OnViewportResize(uint32_t Width, uint32_t Height)
+{
+    m_OutputFramebuffer->Resize(Width, Height);
+}
+
+void SceneRenderer::UploadCommunToShader(Shader* shader, EditorCamera* camera)
+{
+    shader->SetMat4("u_View2World", glm::inverse(camera->GetViewMatrix()));
+    shader->SetMat4("u_World2View", camera->GetViewMatrix());
+    shader->SetMat4("u_View2Clip", camera->GetProjectionMatrix());
+    shader->SetMat4("u_World2Clip", camera->GetViewProjection());
+}
+
+void SceneRenderer::RenderGeometryPass(EditorCamera& camera)
+{
+
     {
-        if (m_Scene)
-        {
-            // BasePass
-            m_BasePass.BeginFrame();
-            RenderGeometryPass(camera);
-            m_BasePass.EndFrame();
+        auto group = m_Scene->m_Registry.view<TransformComponent, MeshRendererComponent>();
+        for (auto& entity : group) {
+            auto [xform, mesh] = group.get<TransformComponent, MeshRendererComponent>(entity);
+            if (!mesh.bEmpty && mesh.bSouldRender) {
+                if (mesh.material->shader != nullptr) {
 
-
-
-            m_DefferedShadingPass.m_MainShader->Bind();
-            UploadCommunToShader(m_DefferedShadingPass.m_MainShader.get(), &camera);
-            m_DefferedShadingPass.m_MainShader->SetFloat3("u_CameraPositionWS", camera.GetPosition()); 
-            glActiveTexture(GL_TEXTURE0+3);
-            glBindTexture(GL_TEXTURE_2D, m_PrefilterEnvMap->getColorAttachement(0));
-            m_DefferedShadingPass.m_MainShader->SetInt("u_IrradianceMap", 3);
-            m_EnviromentTexture->Bind(4);
-            m_DefferedShadingPass.m_MainShader->SetInt("u_EnvMap", 4);
-            m_DefferedShadingPass.Render();
-
-
-
-            // render Compositing pass
-            m_OutputFramebuffer->Bind();
-            //RHICommand::SetClearColor(Vec4(0.f));
-            //RHICommand::Clear();
-            m_CompositingShader->Bind();
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, m_DefferedShadingPass.getFrameBuffer()->getColorAttachement(0));
-            Renderer::Submit(m_ScreenQuadVAO);
-            m_OutputFramebuffer->UnBind();
-        }
-    }
-
-    void SceneRenderer::OnViewportResize(uint32_t Width, uint32_t Height)
-    {
-        m_OutputFramebuffer->Resize(Width, Height);
-    }
-
-    void SceneRenderer::UploadCommunToShader(Shader* shader,EditorCamera* camera)
-    {
-        shader->SetMat4("u_View2World", glm::inverse(camera->GetViewMatrix()));
-        shader->SetMat4("u_World2View", camera->GetViewMatrix());
-        shader->SetMat4("u_View2Clip", camera->GetProjectionMatrix());
-        shader->SetMat4("u_World2Clip", camera->GetViewProjection());
-    }
-
-    void SceneRenderer::RenderGeometryPass(EditorCamera& camera)
-    {
-
-
-        {
-            auto group = m_Scene->m_Registry.view<TransformComponent, MeshRendererComponent>();
-            for (auto& entity : group)
-            {
-                auto [xform, mesh] = group.get<TransformComponent, MeshRendererComponent>(entity);
-                if (!mesh.bEmpty && mesh.bSouldRender)
-                {
-                    if (mesh.material->shader != nullptr)
-                    {
-
-                        mesh.material->shader->Bind();
-                        mesh.material->shader->SetFloat3("u_CameraPositionWS", camera.GetPosition());
-                        mesh.material->shader->SetMat4("u_Transform", xform.Matrix());
-                        UploadCommunToShader(mesh.material->shader.get(),&camera);
-                        mesh.material->ApplyMaterial();
-                    }
-                    mesh.vertexArray->Bind();
-                    RHICommand::DrawIndexed(mesh.vertexArray);
+                    mesh.material->shader->Bind();
+                    mesh.material->shader->SetFloat3("u_CameraPositionWS", camera.GetPosition());
+                    mesh.material->shader->SetMat4("u_Transform", xform.Matrix());
+                    UploadCommunToShader(mesh.material->shader.get(), &camera);
+                    mesh.material->ApplyMaterial();
                 }
-
+                mesh.vertexArray->Bind();
+                RHICommand::DrawIndexed(mesh.vertexArray);
             }
-        }
-
-        auto group2 = m_Scene->m_Registry.view<TransformComponent, SpriteRendererComponent>();
-        for (auto entity : group2)
-        {
-            auto [xform, sprite] = group2.get<TransformComponent, SpriteRendererComponent>(entity);
-            if (sprite.m_Shader)
-            {
-                sprite.m_Shader->Bind();
-                sprite.m_Shader->SetFloat4("u_Color", sprite.m_Color);
-                sprite.m_Shader->SetMat4("u_Transform", xform.Matrix());
-                UploadCommunToShader(sprite.m_Shader, &camera);
-            }
-            m_Scene->m_QuadVAO->Bind();
-            RHICommand::DrawIndexed(m_Scene->m_QuadVAO);
-
         }
     }
+
+    auto group2 = m_Scene->m_Registry.view<TransformComponent, SpriteRendererComponent>();
+    for (auto entity : group2) {
+        auto [xform, sprite] = group2.get<TransformComponent, SpriteRendererComponent>(entity);
+        if (sprite.m_Shader) {
+            sprite.m_Shader->Bind();
+            sprite.m_Shader->SetFloat4("u_Color", sprite.m_Color);
+            sprite.m_Shader->SetMat4("u_Transform", xform.Matrix());
+            UploadCommunToShader(sprite.m_Shader, &camera);
+        }
+        m_Scene->m_QuadVAO->Bind();
+        RHICommand::DrawIndexed(m_Scene->m_QuadVAO);
+    }
+}
 
 }
 
-
-//// Initialisation 
+//// Initialisation
 //FramebufferSpecification bloomfb;
 //bloomfb.width = 1600;
 //bloomfb.height = 900;
@@ -323,8 +300,7 @@ namespace HEngine
 //    m_CompositingShader->SetInt("u_BloomTextures[" + std::to_string(i) + "]", i);
 //}
 
-
-//// SSAO 
+//// SSAO
 //            // SSAO
 //m_SSAOPass->Bind();
 //RHICommand::SetClearColor(Vec4(0.f));
@@ -359,29 +335,29 @@ namespace HEngine
 //Renderer::Submit(m_ScreenQuadVAO);
 //m_SSAOPass->UnBind();
 
-        //// SSAO
-        //FramebufferSpecification SsaoFBSpec;
-        //SsaoFBSpec.width = 1600;
-        //SsaoFBSpec.height = 900;
-        //SsaoFBSpec.Attachements = { FBTextureFormat::RGBA16F };
-        //m_SSAOPass = Framebuffer::Create(SsaoFBSpec);
-        //DebugFBTexturesID["SSAO"] = m_SSAOPass->getColorAttachement(0);
-        ////SSAO Samples 
-        //std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // random floats between [0.0, 1.0]
-        //std::default_random_engine generator;
-        //for (unsigned int i = 0; i < 64; ++i)
-        //{
-        //    Vec3 sample(
-        //        randomFloats(generator) * 2.0 - 1.0,
-        //        randomFloats(generator) * 2.0 - 1.0,
-        //        randomFloats(generator)
-        //    );
-        //    sample = glm::normalize(sample);
-        //    sample *= randomFloats(generator);
-        //    float scale = (float)i / 64.0;
-        //    scale = lerp(0.1f, 1.0f, scale * scale);
-        //    sample *= scale;
-        //    SSAOKernel.push_back(sample);
-        //}
-        //SSAONoiseTexture = Texture2D::Create("assets/textures/BlueNoise1_16.png");
-        //DebugFBTexturesID["SSAO Noise"] = SSAONoiseTexture->getID();
+//// SSAO
+//FramebufferSpecification SsaoFBSpec;
+//SsaoFBSpec.width = 1600;
+//SsaoFBSpec.height = 900;
+//SsaoFBSpec.Attachements = { FBTextureFormat::RGBA16F };
+//m_SSAOPass = Framebuffer::Create(SsaoFBSpec);
+//DebugFBTexturesID["SSAO"] = m_SSAOPass->getColorAttachement(0);
+////SSAO Samples
+//std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // random floats between [0.0, 1.0]
+//std::default_random_engine generator;
+//for (unsigned int i = 0; i < 64; ++i)
+//{
+//    Vec3 sample(
+//        randomFloats(generator) * 2.0 - 1.0,
+//        randomFloats(generator) * 2.0 - 1.0,
+//        randomFloats(generator)
+//    );
+//    sample = glm::normalize(sample);
+//    sample *= randomFloats(generator);
+//    float scale = (float)i / 64.0;
+//    scale = lerp(0.1f, 1.0f, scale * scale);
+//    sample *= scale;
+//    SSAOKernel.push_back(sample);
+//}
+//SSAONoiseTexture = Texture2D::Create("assets/textures/BlueNoise1_16.png");
+//DebugFBTexturesID["SSAO Noise"] = SSAONoiseTexture->getID();

@@ -7,25 +7,24 @@
 
 namespace HEngine {
 
-    class HOPE_API ImGuiLayer :  public Layer
-    {
-    public:
-        ImGuiLayer();
-        ~ImGuiLayer();
+class HOPE_API ImGuiLayer : public Layer {
+public:
+    ImGuiLayer();
+    ~ImGuiLayer();
 
-        void OnAttach() override;
-        void OnDetach() override;
-        void OnEvent(Event& e) override;
-        virtual void OnImGuiRender() override;
+    void OnAttach() override;
+    void OnDetach() override;
+    void OnEvent(Event& e) override;
+    void OnImGuiRender() override;
 
-        void Begin();
-        void End();
+    void Begin();
+    void End();
 
-        void BlockEvents(bool block) { m_BlockEvents = block; }
-        void SetDarkThemeColors();
-    private:
-        bool m_BlockEvents = true;
-        float m_Time = 0;
-    };
+    void BlockEvents(bool block) { m_BlockEvents = block; }
+    void SetDarkThemeColors();
+
+private:
+    bool m_BlockEvents = true;
+    float m_Time = 0;
+};
 }
-

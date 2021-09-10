@@ -4,8 +4,8 @@
 #include "ECS/Serializer.h"
 #include "Utility/PlatformUtils.h"
 
-#include <ImGuizmo.h>
-#include <glm/gtc/type_ptr.hpp>
+#include "ImGuizmo.h"
+#include "glm/gtc/type_ptr.hpp"
 #include "Maths/Maths.h"
 
 using namespace HEngine;
@@ -242,7 +242,9 @@ void EditorLayer::OnImGuiRender()
 
     ImGui::End();
     ImGui::PopStyleVar();
+
     m_OutlinerPanel.OnImGuiRender();
+    m_ContentBrowserPannel.OnImGuiRender();
 
     // Material editor
     ImGui::Begin("Material editor");
